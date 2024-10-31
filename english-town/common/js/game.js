@@ -18,17 +18,15 @@ CustomWiggle.create("wiggle", {wiggles: 3, type:"linear"});
         }
 
         function checkGround () {
+            var rect1 = {
+                x: this.tar.x + this.tar.bottom.x, 
+                y: this.tar.y + this.tar.bottom.y + 756, 
+                width: this.tar.bottom.nominalBounds.width * this.tar.bottom.scaleX,
+                height: this.tar.bottom.nominalBounds.height * this.tar.bottom.scaleY,
+            }
             for (var i= 0; i < this.map.numChildren; i++) {
                 var m = this.map.getChildAt(i);
                 if(String(m.name).includes("ground")) {
-                    // var pt = m.getChildAt().globalToLocal(0, 0)
-                    
-                    var rect1 = {
-                        x: this.tar.x + this.tar.bottom.x, 
-                        y: this.tar.y + this.tar.bottom.y + 756, 
-                        width: this.tar.bottom.nominalBounds.width * this.tar.bottom.scaleX,
-                        height: this.tar.bottom.nominalBounds.height * this.tar.bottom.scaleY,
-                    }
                     var rect2 = {
                         x: m.x, 
                         y: m.y,
@@ -45,17 +43,18 @@ CustomWiggle.create("wiggle", {wiggles: 3, type:"linear"});
         }
 
         function checkFront () {
+            var rect1 = {
+                x: this.tar.x + arrow.x, 
+                y: this.tar.y + arrow.y + 756, 
+                width: arrow.nominalBounds.width * arrow.scaleX,
+                height: arrow.nominalBounds.height * arrow.scaleY,
+            }
+            var arrow = this.tar.right;
+            if(this.tar.tar.scaleX < 0) arrow = this.tar.left;
             for (var i= 0; i < this.map.numChildren; i++) {
-                var m = this.map.getChildAt(i);
-                var arrow = this.tar.right;
-                if(this.tar.tar.scaleX < 0) arrow = this.tar.left;
+                var m = this.map.getChildAt(i);    
                 if(String(m.name).includes("ground")) {
-                    var rect1 = {
-                        x: this.tar.x + arrow.x, 
-                        y: this.tar.y + arrow.y + 756, 
-                        width: arrow.nominalBounds.width * arrow.scaleX,
-                        height: arrow.nominalBounds.height * arrow.scaleY,
-                    }
+                    
                     var rect2 = {
                         x: m.x, 
                         y: m.y,
@@ -88,15 +87,15 @@ CustomWiggle.create("wiggle", {wiggles: 3, type:"linear"});
         }
 
         function checkItem() {
+            var rect1 = {
+                x: this.tar.x - ((this.tar.nominalBounds.width * this.tar.scaleX)/2), 
+                y: this.tar.y - ((this.tar.nominalBounds.height * this.tar.scaleY)/2), 
+                width: this.tar.nominalBounds.width * this.tar.scaleX,
+                height: this.tar.nominalBounds.height * this.tar.scaleY,
+            }
             for (var i= this.tar.parent.numChildren-1; i >= 0; i--) {
                 var m = this.tar.parent.getChildAt(i);
                 if(String(m.name).includes("item")) {
-                    var rect1 = {
-                        x: this.tar.x - ((this.tar.nominalBounds.width * this.tar.scaleX)/2), 
-                        y: this.tar.y - ((this.tar.nominalBounds.height * this.tar.scaleY)/2), 
-                        width: this.tar.nominalBounds.width * this.tar.scaleX,
-                        height: this.tar.nominalBounds.height * this.tar.scaleY,
-                    }
                     var rect2 = {
                         x: m.x - 31, 
                         y: m.y - 35,
@@ -121,6 +120,7 @@ CustomWiggle.create("wiggle", {wiggles: 3, type:"linear"});
                 this.jumFlag = false;
                 this.finishTarget = null;
                 this.isJump = false;
+                this.isDie = false;
                 this.isQuiz = false; 
 			},
 
