@@ -1,0 +1,147 @@
+﻿@charset "utf-8";
+
+@keyframes flash-ani {
+   0% {
+      opacity: 1;
+   }
+   49.999% {
+      opacity: 1;
+   }
+   50% {
+      opacity: 0.9;
+   }
+   99.999% {
+      opacity: 0.9;
+   }
+   100% {
+      opacity: 1;
+   }
+}
+
+#background {
+   position: absolute;
+   left: 0px;
+   top: 0px;
+   width: 100%;
+   height: 100%;
+   background-repeat: no-repeat;
+   background-size: 100%;
+}
+
+
+#ending {
+   position: absolute;
+   left: 0px;
+   top: 0px;
+   width: 100%;
+   height: 100%;
+}
+#ending .research {
+   position: absolute;
+   left: 642px;
+   top: 309px;
+}
+#ending .research .btn {
+   opacity: 0;
+   pointer-events: none;
+}
+
+#ending .research .btn:nth-child(1) {
+   position: absolute;
+   left: -8px;
+   top: -280px;
+   width: 281px;
+   height: 413px;
+   background: url('../images/research_btn1.png') no-repeat;
+   background-size: 100%;
+   transform-origin: 0% 80%;
+}
+#ending .research .btn:nth-child(2) {
+   position: absolute;
+   left: -238px;
+   top: 57px;
+   width: 473px;
+   height: 213px;
+   background: url('../images/research_btn2.png') no-repeat;
+   background-size: 100%;
+   transform-origin: 50% 0%;
+}
+#ending .research .btn:nth-child(3) {
+   position: absolute;
+   left: -278px;
+   top: -280px;
+   width: 281px;
+   height: 413px;
+   background: url('../images/research_btn3.png') no-repeat;
+   background-size: 100%;
+   transform-origin: 100% 80%;
+}
+#ending .research .btn.active {
+   background-position-y: 100%;
+   pointer-events: all;
+   animation: flash-ani 1s infinite;
+}
+#ending .research .btn:hover {
+   background-position-y: 50%;
+}
+
+#ending .blind-con {
+   position: absolute;
+   left: 0px;
+   top: 0px;
+   width: 100%;
+   height: 100%;
+   z-index: 999;
+}
+
+#ending .restart-btn {
+   position: absolute;
+   left: 970px;
+   bottom: 25px;
+   width: 262px;
+   height: 73px;
+   background: url('../images/restart_btn.png') no-repeat;
+   background-size: 100%;
+   cursor: pointer;
+}
+
+
+#ending-loading {
+   position: absolute;
+   left: 0;
+   top: 0;
+   width: 100%;
+   height: 100%;
+   z-index: 8888;
+}
+#ending-loading .loading-con {
+   width: 100%;
+   height: 100%;
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   justify-content: center;
+}
+
+#ending-loading .progress {
+   position: relative;
+   width: 812px;
+   height: 39px;
+   background: url('../images/loading_bg.png') no-repeat;
+   background-size: 100%;
+   margin-top: 395px;
+}
+#ending-loading .progress .bar {
+   position: absolute;
+   left: 5px;
+   top: 4px;
+   width: 0;
+   height: 30px;
+   background: url('../images/loading_bar.png') no-repeat;
+}
+#ending-loading .text {
+   font-family: 'NanumSquareEB';
+   color: #35458D;
+   font-size: 44px;
+   margin-top: 10px;
+}

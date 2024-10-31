@@ -1,0 +1,213 @@
+﻿@charset "utf-8";
+
+@keyframes up-ani {
+   0% {
+      transform: translateY(0);
+   }
+   50% {
+      transform: translateY(-10px);
+   }
+   100% {
+      transform: translateY(0);
+   }
+}
+
+#background {
+   position: absolute;
+   left: 0px;
+   top: 0px;
+   width: 100%;
+   height: 100%;
+   background: url('../images/intro_bg.png') no-repeat;
+}
+
+#intro {
+   position: absolute;
+   left: 0px;
+   top: 0px;
+   width: 100%;
+   height: 100%;
+   z-index: 9999;
+}
+
+#white {
+   position: absolute;
+   left: 0px;
+   top: 0px;
+   width: 100%;
+   height: 100%;
+   background-color: rgba(255,255,255,0.3);
+   opacity: 0;
+   z-index: 8888;
+}
+
+
+
+#intro .level-btn {
+   position: absolute;
+   left: 0px;
+   top: 0px;
+}
+#intro .level-btn {
+   position: absolute;
+   cursor: pointer;
+}
+#intro .level-btn.hard {
+   left: 305px;
+   top: 385px;
+   width: 223px;
+   height: 145px;
+   background: url('../images/level_btn1.png') no-repeat;
+   background-position-y: 100%;
+   background-size: 100%;
+   transform-origin: bottom right;
+}
+
+#intro .level-btn.normal {
+   left: 534px;
+   top: 453px;
+   width: 216px;
+   height: 85px;
+   background: url('../images/level_btn2.png') no-repeat;
+   background-position-y: 100%;
+   background-size: 100%;
+   transform-origin: bottom center;
+}
+
+#intro .level-btn.easy {
+   left: 754px;
+   top: 385px;
+   width: 223px;
+   height: 145px;
+   background: url('../images/level_btn3.png') no-repeat;
+   background-position-y: 100%;
+   background-size: 100%;
+   transform-origin: bottom left;
+}
+
+#intro .level-btn.active {
+   background-position-y: 0;
+}
+
+#intro .start-btn {
+   position: absolute;
+   left: 523px;
+   top: 543px;
+   width: 232px;
+   height: 74px;
+   background: url('../images/start_btn.png') no-repeat;
+   background-size: 100%;
+}
+#intro .start-btn.down {
+   background-position-y: 100%;
+}
+
+#intro .marker {
+   position: absolute;
+   left: 0;
+   top: 0;
+}
+#intro .marker-set {
+   position: relative;
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   justify-content: center;
+}
+
+#intro .marker .icon {
+   width: 80px;
+   height: 112px;
+   animation: up-ani 1s infinite;
+}
+#intro .marker .icon.juno {
+   background: url('../images/marker_juno.png') no-repeat;
+   background-size: 100%;
+}
+#intro .marker .icon.eric {
+   background: url('../images/marker_eric.png') no-repeat;
+   background-size: 100%;
+}
+#intro .marker .icon.bora {
+   background: url('../images/marker_bora.png') no-repeat;
+   background-size: 100%;
+}
+#intro .marker .icon.sam {
+   background: url('../images/marker_sam.png') no-repeat;
+   background-size: 100%;
+}
+#intro .marker .icon.hoya {
+   background: url('../images/marker_hoya.png') no-repeat;
+   background-size: 100%;
+}
+#intro .marker .icon.kate {
+   background: url('../images/marker_kate.png') no-repeat;
+   background-size: 100%;
+}
+#intro .marker .icon.my {
+   background: url('../images/marker_my.png') no-repeat;
+   background-size: 100%;
+}
+#intro .marker .name {
+   width: 100px;
+   height: 33px;
+   background-color: #E2EE84;
+   border-radius: 18px;
+   text-align: center;
+   line-height: 33px;
+   font-family: 'NanumGothicEB';
+   font-size: 20px;
+   margin-top: 15px;
+}
+
+#talk {
+   position: absolute;
+   left: 0px;
+   top: 0px;
+   width: 100%;
+   height: 100%;
+   z-index: 888;
+}
+
+#talk-bg {
+   position: absolute;
+   left: 0px;
+   top: 0px;
+   width: 100%;
+   height: 100%;
+}
+
+#blind-bg {
+   position: absolute;
+   left: 0px;
+   top: 0px;
+   width: 100%;
+   height: 100%;
+   background-color: #282245;
+   opacity: 0;
+   z-index: 9999;
+}
+
+#map-btn {
+   position: absolute;
+   right: 30px;
+   top: 60px;
+   width: 182px;
+   height: 55px;
+   background: url('../images/map_btn.png') no-repeat;
+   background-size: 100%;
+}
+
+#map-close {
+   position: absolute;
+   right: 30px;
+   top: 22px;
+   width: 45px;
+   height: 51px;
+   background: url('../images/map_close.png') no-repeat;
+   background-size: 100%;
+}
+
+#map-close.down {
+   background-position-y: 100%;
+}
