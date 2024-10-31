@@ -186,6 +186,7 @@ CustomWiggle.create("wiggle", {wiggles: 3, type:"linear"});
                     this.isDie = true;
                     var repos = checkReposition.call(this);
                     owner.tar.tar.gotoAndStop(0);
+                    this.tar.tar.scaleX = 1;
                     gsap.set(owner.tar, {delay:1, x: repos.x, y: repos.y, alpha: 0.7});
                     gsap.to(owner.tar, 0.7, {delay:1, alpha: 1, ease: 'wiggle', onComplete: function () {
                         owner.isDie = false;

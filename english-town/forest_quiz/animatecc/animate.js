@@ -3,7 +3,7 @@
 var p; // shortcut to reference prototypes
 var lib={};var ss={};var img={};
 lib.ssMetadata = [
-		{name:"animate_atlas_1", frames: [[1894,1620,67,144],[1550,1392,170,136],[1722,1392,170,136],[1550,1530,170,136],[1722,1530,170,136],[1110,1392,132,202],[1996,0,34,129],[1996,131,35,125],[1988,494,58,140],[1963,1620,59,140],[1376,1392,172,138],[1988,902,36,116],[1376,1532,170,136],[1110,1596,170,136],[1996,258,26,69],[1894,1533,142,85],[1988,1148,32,97],[852,1392,256,213],[2032,0,14,31],[1353,1670,127,43],[852,1665,162,49],[1548,1668,174,43],[1894,1392,125,139],[1482,1713,184,29],[852,1607,219,56],[576,0,282,346],[860,0,282,346],[1144,0,282,346],[1428,0,282,346],[1712,0,282,346],[0,348,282,346],[284,348,282,346],[568,348,282,346],[852,348,282,346],[1136,348,282,346],[1420,348,282,346],[1704,348,282,346],[0,696,282,346],[284,696,282,346],[568,696,282,346],[852,696,282,346],[1136,696,282,346],[1420,696,282,346],[1704,696,282,346],[0,1044,282,346],[284,1044,282,346],[568,1044,282,346],[852,1044,282,346],[1136,1044,282,346],[1420,1044,282,346],[1704,1044,282,346],[0,1392,282,346],[284,1392,282,346],[568,1392,282,346],[0,0,286,346],[288,0,286,346],[1244,1392,130,201],[1988,1020,32,126],[1988,776,34,124],[1016,1665,80,75],[1724,1668,84,67],[1988,348,57,144],[1282,1595,69,149],[1988,636,57,138]]},
+		{name:"animate_atlas_1", frames: [[1834,1588,67,144],[1292,1392,170,136],[1464,1392,170,136],[1636,1392,170,136],[1808,1392,170,136],[852,1392,132,202],[1996,0,34,129],[1996,131,35,125],[1988,494,58,140],[1984,1392,59,140],[1118,1392,172,138],[1988,902,36,116],[1292,1530,170,136],[1464,1530,170,136],[1996,258,26,69],[1118,1532,142,85],[1988,1148,32,97],[2032,0,14,31],[852,1647,127,43],[852,1596,162,49],[1016,1619,174,43],[1636,1530,125,139],[981,1664,184,29],[1763,1530,219,56],[576,0,282,346],[860,0,282,346],[1144,0,282,346],[1428,0,282,346],[1712,0,282,346],[0,348,282,346],[284,348,282,346],[568,348,282,346],[852,348,282,346],[1136,348,282,346],[1420,348,282,346],[1704,348,282,346],[0,696,282,346],[284,696,282,346],[568,696,282,346],[852,696,282,346],[1136,696,282,346],[1420,696,282,346],[1704,696,282,346],[0,1044,282,346],[284,1044,282,346],[568,1044,282,346],[852,1044,282,346],[1136,1044,282,346],[1420,1044,282,346],[1704,1044,282,346],[0,1392,282,346],[284,1392,282,346],[568,1392,282,346],[0,0,286,346],[288,0,286,346],[986,1392,130,201],[1988,1020,32,126],[1988,776,34,124],[1903,1588,80,75],[1192,1619,84,67],[1988,348,57,144],[1763,1588,69,149],[1988,636,57,138]]},
 		{name:"animate_atlas_2", frames: [[300,1444,296,346],[1282,746,292,346],[1472,1442,287,346],[1574,1094,287,346],[1182,1444,288,346],[891,1444,289,346],[1282,1094,290,346],[598,1444,291,346],[1761,1442,287,346],[1576,746,287,346],[1582,360,292,346],[1582,0,295,358],[1282,0,298,371],[0,1444,298,371],[1282,373,298,371],[0,0,1280,720],[0,722,1280,720]]},
 		{name:"animate_atlas_3", frames: [[0,0,1280,720],[0,722,1280,720]]},
 		{name:"animate_atlas_4", frames: [[0,0,1280,720],[0,722,1280,720]]},
@@ -152,268 +152,261 @@ lib.ssMetadata = [
 
 
 
-(lib.Bitmap128 = function() {
+(lib.Bitmap129 = function() {
 	this.initialize(ss["animate_atlas_1"]);
 	this.gotoAndStop(17);
 }).prototype = p = new cjs.Sprite();
 
 
 
-(lib.Bitmap129 = function() {
+(lib.Bitmap147 = function() {
 	this.initialize(ss["animate_atlas_1"]);
 	this.gotoAndStop(18);
 }).prototype = p = new cjs.Sprite();
 
 
 
-(lib.Bitmap147 = function() {
+(lib.Bitmap148 = function() {
 	this.initialize(ss["animate_atlas_1"]);
 	this.gotoAndStop(19);
 }).prototype = p = new cjs.Sprite();
 
 
 
-(lib.Bitmap148 = function() {
+(lib.Bitmap149 = function() {
 	this.initialize(ss["animate_atlas_1"]);
 	this.gotoAndStop(20);
 }).prototype = p = new cjs.Sprite();
 
 
 
-(lib.Bitmap149 = function() {
+(lib.Bitmap15 = function() {
 	this.initialize(ss["animate_atlas_1"]);
 	this.gotoAndStop(21);
 }).prototype = p = new cjs.Sprite();
 
 
 
-(lib.Bitmap15 = function() {
+(lib.Bitmap150 = function() {
 	this.initialize(ss["animate_atlas_1"]);
 	this.gotoAndStop(22);
 }).prototype = p = new cjs.Sprite();
 
 
 
-(lib.Bitmap150 = function() {
+(lib.Bitmap151 = function() {
 	this.initialize(ss["animate_atlas_1"]);
 	this.gotoAndStop(23);
 }).prototype = p = new cjs.Sprite();
 
 
 
-(lib.Bitmap151 = function() {
+(lib.Bitmap152 = function() {
 	this.initialize(ss["animate_atlas_1"]);
 	this.gotoAndStop(24);
 }).prototype = p = new cjs.Sprite();
 
 
 
-(lib.Bitmap152 = function() {
+(lib.Bitmap153 = function() {
 	this.initialize(ss["animate_atlas_1"]);
 	this.gotoAndStop(25);
 }).prototype = p = new cjs.Sprite();
 
 
 
-(lib.Bitmap153 = function() {
+(lib.Bitmap154 = function() {
 	this.initialize(ss["animate_atlas_1"]);
 	this.gotoAndStop(26);
 }).prototype = p = new cjs.Sprite();
 
 
 
-(lib.Bitmap154 = function() {
+(lib.Bitmap155 = function() {
 	this.initialize(ss["animate_atlas_1"]);
 	this.gotoAndStop(27);
 }).prototype = p = new cjs.Sprite();
 
 
 
-(lib.Bitmap155 = function() {
+(lib.Bitmap156 = function() {
 	this.initialize(ss["animate_atlas_1"]);
 	this.gotoAndStop(28);
 }).prototype = p = new cjs.Sprite();
 
 
 
-(lib.Bitmap156 = function() {
+(lib.Bitmap157 = function() {
 	this.initialize(ss["animate_atlas_1"]);
 	this.gotoAndStop(29);
 }).prototype = p = new cjs.Sprite();
 
 
 
-(lib.Bitmap157 = function() {
+(lib.Bitmap158 = function() {
 	this.initialize(ss["animate_atlas_1"]);
 	this.gotoAndStop(30);
 }).prototype = p = new cjs.Sprite();
 
 
 
-(lib.Bitmap158 = function() {
+(lib.Bitmap159 = function() {
 	this.initialize(ss["animate_atlas_1"]);
 	this.gotoAndStop(31);
 }).prototype = p = new cjs.Sprite();
 
 
 
-(lib.Bitmap159 = function() {
+(lib.Bitmap160 = function() {
 	this.initialize(ss["animate_atlas_1"]);
 	this.gotoAndStop(32);
 }).prototype = p = new cjs.Sprite();
 
 
 
-(lib.Bitmap160 = function() {
+(lib.Bitmap161 = function() {
 	this.initialize(ss["animate_atlas_1"]);
 	this.gotoAndStop(33);
 }).prototype = p = new cjs.Sprite();
 
 
 
-(lib.Bitmap161 = function() {
+(lib.Bitmap162 = function() {
 	this.initialize(ss["animate_atlas_1"]);
 	this.gotoAndStop(34);
 }).prototype = p = new cjs.Sprite();
 
 
 
-(lib.Bitmap162 = function() {
+(lib.Bitmap163 = function() {
 	this.initialize(ss["animate_atlas_1"]);
 	this.gotoAndStop(35);
 }).prototype = p = new cjs.Sprite();
 
 
 
-(lib.Bitmap163 = function() {
+(lib.Bitmap164 = function() {
 	this.initialize(ss["animate_atlas_1"]);
 	this.gotoAndStop(36);
 }).prototype = p = new cjs.Sprite();
 
 
 
-(lib.Bitmap164 = function() {
+(lib.Bitmap165 = function() {
 	this.initialize(ss["animate_atlas_1"]);
 	this.gotoAndStop(37);
 }).prototype = p = new cjs.Sprite();
 
 
 
-(lib.Bitmap165 = function() {
+(lib.Bitmap166 = function() {
 	this.initialize(ss["animate_atlas_1"]);
 	this.gotoAndStop(38);
 }).prototype = p = new cjs.Sprite();
 
 
 
-(lib.Bitmap166 = function() {
+(lib.Bitmap167 = function() {
 	this.initialize(ss["animate_atlas_1"]);
 	this.gotoAndStop(39);
 }).prototype = p = new cjs.Sprite();
 
 
 
-(lib.Bitmap167 = function() {
+(lib.Bitmap168 = function() {
 	this.initialize(ss["animate_atlas_1"]);
 	this.gotoAndStop(40);
 }).prototype = p = new cjs.Sprite();
 
 
 
-(lib.Bitmap168 = function() {
+(lib.Bitmap169 = function() {
 	this.initialize(ss["animate_atlas_1"]);
 	this.gotoAndStop(41);
 }).prototype = p = new cjs.Sprite();
 
 
 
-(lib.Bitmap169 = function() {
+(lib.Bitmap170 = function() {
 	this.initialize(ss["animate_atlas_1"]);
 	this.gotoAndStop(42);
 }).prototype = p = new cjs.Sprite();
 
 
 
-(lib.Bitmap170 = function() {
+(lib.Bitmap171 = function() {
 	this.initialize(ss["animate_atlas_1"]);
 	this.gotoAndStop(43);
 }).prototype = p = new cjs.Sprite();
 
 
 
-(lib.Bitmap171 = function() {
+(lib.Bitmap172 = function() {
 	this.initialize(ss["animate_atlas_1"]);
 	this.gotoAndStop(44);
 }).prototype = p = new cjs.Sprite();
 
 
 
-(lib.Bitmap172 = function() {
+(lib.Bitmap173 = function() {
 	this.initialize(ss["animate_atlas_1"]);
 	this.gotoAndStop(45);
 }).prototype = p = new cjs.Sprite();
 
 
 
-(lib.Bitmap173 = function() {
+(lib.Bitmap174 = function() {
 	this.initialize(ss["animate_atlas_1"]);
 	this.gotoAndStop(46);
 }).prototype = p = new cjs.Sprite();
 
 
 
-(lib.Bitmap174 = function() {
+(lib.Bitmap175 = function() {
 	this.initialize(ss["animate_atlas_1"]);
 	this.gotoAndStop(47);
 }).prototype = p = new cjs.Sprite();
 
 
 
-(lib.Bitmap175 = function() {
+(lib.Bitmap176 = function() {
 	this.initialize(ss["animate_atlas_1"]);
 	this.gotoAndStop(48);
 }).prototype = p = new cjs.Sprite();
 
 
 
-(lib.Bitmap176 = function() {
+(lib.Bitmap181 = function() {
 	this.initialize(ss["animate_atlas_1"]);
 	this.gotoAndStop(49);
 }).prototype = p = new cjs.Sprite();
 
 
 
-(lib.Bitmap181 = function() {
+(lib.Bitmap182 = function() {
 	this.initialize(ss["animate_atlas_1"]);
 	this.gotoAndStop(50);
 }).prototype = p = new cjs.Sprite();
 
 
 
-(lib.Bitmap182 = function() {
+(lib.Bitmap183 = function() {
 	this.initialize(ss["animate_atlas_1"]);
 	this.gotoAndStop(51);
 }).prototype = p = new cjs.Sprite();
 
 
 
-(lib.Bitmap183 = function() {
+(lib.Bitmap185 = function() {
 	this.initialize(ss["animate_atlas_1"]);
 	this.gotoAndStop(52);
 }).prototype = p = new cjs.Sprite();
 
 
 
-(lib.Bitmap185 = function() {
-	this.initialize(ss["animate_atlas_1"]);
-	this.gotoAndStop(53);
-}).prototype = p = new cjs.Sprite();
-
-
-
 (lib.Bitmap186 = function() {
 	this.initialize(ss["animate_atlas_1"]);
-	this.gotoAndStop(54);
+	this.gotoAndStop(53);
 }).prototype = p = new cjs.Sprite();
 
 
@@ -434,7 +427,7 @@ lib.ssMetadata = [
 
 (lib.Bitmap192 = function() {
 	this.initialize(ss["animate_atlas_1"]);
-	this.gotoAndStop(55);
+	this.gotoAndStop(54);
 }).prototype = p = new cjs.Sprite();
 
 
@@ -532,83 +525,83 @@ lib.ssMetadata = [
 
 (lib.Bitmap92 = function() {
 	this.initialize(ss["animate_atlas_1"]);
-	this.gotoAndStop(56);
+	this.gotoAndStop(55);
 }).prototype = p = new cjs.Sprite();
 
 
 
 (lib.Bitmap93 = function() {
 	this.initialize(ss["animate_atlas_1"]);
-	this.gotoAndStop(57);
+	this.gotoAndStop(56);
 }).prototype = p = new cjs.Sprite();
 
 
 
 (lib.Bitmap94 = function() {
 	this.initialize(ss["animate_atlas_1"]);
-	this.gotoAndStop(58);
+	this.gotoAndStop(57);
 }).prototype = p = new cjs.Sprite();
 
 
 
 (lib.Bitmap95 = function() {
 	this.initialize(ss["animate_atlas_1"]);
-	this.gotoAndStop(59);
+	this.gotoAndStop(58);
 }).prototype = p = new cjs.Sprite();
 
 
 
 (lib.Bitmap96 = function() {
 	this.initialize(ss["animate_atlas_1"]);
-	this.gotoAndStop(60);
+	this.gotoAndStop(59);
 }).prototype = p = new cjs.Sprite();
 
 
 
 (lib.Bitmap97 = function() {
 	this.initialize(ss["animate_atlas_1"]);
-	this.gotoAndStop(61);
+	this.gotoAndStop(60);
 }).prototype = p = new cjs.Sprite();
 
 
 
 (lib.Bitmap98 = function() {
 	this.initialize(ss["animate_atlas_1"]);
-	this.gotoAndStop(62);
+	this.gotoAndStop(61);
 }).prototype = p = new cjs.Sprite();
 
 
 
 (lib.Bitmap99 = function() {
 	this.initialize(ss["animate_atlas_1"]);
-	this.gotoAndStop(63);
+	this.gotoAndStop(62);
 }).prototype = p = new cjs.Sprite();
 
 
 
 (lib.game_bg1 = function() {
-	this.initialize(ss["animate_atlas_3"]);
+	this.initialize(ss["animate_atlas_7"]);
 	this.gotoAndStop(0);
 }).prototype = p = new cjs.Sprite();
 
 
 
 (lib.game_bg10 = function() {
-	this.initialize(ss["animate_atlas_3"]);
+	this.initialize(ss["animate_atlas_7"]);
 	this.gotoAndStop(1);
 }).prototype = p = new cjs.Sprite();
 
 
 
 (lib.game_bg11 = function() {
-	this.initialize(ss["animate_atlas_4"]);
+	this.initialize(ss["animate_atlas_6"]);
 	this.gotoAndStop(0);
 }).prototype = p = new cjs.Sprite();
 
 
 
 (lib.game_bg12 = function() {
-	this.initialize(ss["animate_atlas_4"]);
+	this.initialize(ss["animate_atlas_6"]);
 	this.gotoAndStop(1);
 }).prototype = p = new cjs.Sprite();
 
@@ -629,28 +622,28 @@ lib.ssMetadata = [
 
 
 (lib.game_bg4 = function() {
-	this.initialize(ss["animate_atlas_6"]);
+	this.initialize(ss["animate_atlas_4"]);
 	this.gotoAndStop(0);
 }).prototype = p = new cjs.Sprite();
 
 
 
 (lib.game_bg5 = function() {
-	this.initialize(ss["animate_atlas_6"]);
+	this.initialize(ss["animate_atlas_4"]);
 	this.gotoAndStop(1);
 }).prototype = p = new cjs.Sprite();
 
 
 
 (lib.game_bg6 = function() {
-	this.initialize(ss["animate_atlas_7"]);
+	this.initialize(ss["animate_atlas_3"]);
 	this.gotoAndStop(0);
 }).prototype = p = new cjs.Sprite();
 
 
 
 (lib.game_bg7 = function() {
-	this.initialize(ss["animate_atlas_7"]);
+	this.initialize(ss["animate_atlas_3"]);
 	this.gotoAndStop(1);
 }).prototype = p = new cjs.Sprite();
 
@@ -808,30 +801,6 @@ if (reversed == null) { reversed = false; }
 	this._renderFirstFrame();
 
 }).prototype = getMCSymbolPrototype(lib.Symbol123, new cjs.Rectangle(0,0,62.5,69.5), null);
-
-
-(lib.Symbol21 = function(mode,startPosition,loop,reversed) {
-if (loop == null) { loop = true; }
-if (reversed == null) { reversed = false; }
-	var props = new Object();
-	props.mode = mode;
-	props.startPosition = startPosition;
-	props.labels = {};
-	props.loop = loop;
-	props.reversed = reversed;
-	cjs.MovieClip.apply(this,[props]);
-
-	// Layer_2
-	this.instance = new lib.Bitmap128();
-	this.instance.setTransform(-8,-1,0.667,0.667);
-	this.instance._off = true;
-
-	this.timeline.addTween(cjs.Tween.get(this.instance).wait(1).to({_off:false},0).wait(1));
-
-	this._renderFirstFrame();
-
-}).prototype = p = new cjs.MovieClip();
-p.nominalBounds = new cjs.Rectangle(-8,-1,170.8,142.1);
 
 
 (lib.ground = function(mode,startPosition,loop,reversed) {
@@ -1130,102 +1099,182 @@ if (reversed == null) { reversed = false; }
 	cjs.MovieClip.apply(this,[props]);
 
 	// ground
+	this.ground34 = new lib.ground();
+	this.ground34.name = "ground34";
+	this.ground34.setTransform(14342.9,654.1,0.5828,1.7604,0,0,0,0.2,0.1);
+	this.ground34.alpha = 0;
+
+	this.ground33 = new lib.ground();
+	this.ground33.name = "ground33";
+	this.ground33.setTransform(14249.9,540.55,0.0527,2.3756,0,0,0,0,0.2);
+	this.ground33.alpha = 0;
+
+	this.ground32 = new lib.ground();
+	this.ground32.name = "ground32";
+	this.ground32.setTransform(13995.75,654.1,0.1451,1.7604,0,0,0,0.4,0.1);
+	this.ground32.alpha = 0;
+
+	this.ground31 = new lib.ground();
+	this.ground31.name = "ground31";
+	this.ground31.setTransform(13531.4,577.35,0.263,2.1593,0,0,0,0.6,0.2);
+	this.ground31.alpha = 0;
+
+	this.ground30 = new lib.ground();
+	this.ground30.name = "ground30";
+	this.ground30.setTransform(13072.7,577.35,0.1286,2.1593,0,0,0,0.4,0.2);
+	this.ground30.alpha = 0;
+
+	this.ground29 = new lib.ground();
+	this.ground29.name = "ground29";
+	this.ground29.setTransform(11929.95,654.1,0.6469,1.7604,0,0,0,0.5,0.1);
+	this.ground29.alpha = 0;
+
+	this.ground28 = new lib.ground();
+	this.ground28.name = "ground28";
+	this.ground28.setTransform(11836.75,540.55,0.0527,2.3756,0,0,0,0,0.2);
+	this.ground28.alpha = 0;
+
+	this.ground27 = new lib.ground();
+	this.ground27.name = "ground27";
+	this.ground27.setTransform(11504.4,654.1,0.1888,1.7604,0,0,0,0.2,0.1);
+	this.ground27.alpha = 0;
+
+	this.ground26 = new lib.ground();
+	this.ground26.name = "ground26";
+	this.ground26.setTransform(11082.65,514.25,0.1729,2.478,0,0,0,0.3,0.2);
+	this.ground26.alpha = 0;
+
+	this.ground25 = new lib.ground();
+	this.ground25.name = "ground25";
+	this.ground25.setTransform(10775.3,586.3,0.1729,2.1037,0,0,0,0.3,0.2);
+	this.ground25.alpha = 0;
+
+	this.ground24 = new lib.ground();
+	this.ground24.name = "ground24";
+	this.ground24.setTransform(9967.1,654.1,0.4116,1.7604,0,0,0,0.2,0.1);
+	this.ground24.alpha = 0;
+
+	this.ground23 = new lib.ground();
+	this.ground23.name = "ground23";
+	this.ground23.setTransform(9873.95,544.55,0.0527,2.3756,0,0,0,0,0.2);
+	this.ground23.alpha = 0;
+
+	this.ground22 = new lib.ground();
+	this.ground22.name = "ground22";
+	this.ground22.setTransform(8684.25,654.1,0.6736,1.7604,0,0,0,0.2,0.1);
+	this.ground22.alpha = 0;
+
+	this.ground21 = new lib.ground();
+	this.ground21.name = "ground21";
+	this.ground21.setTransform(8475,575.1,0.1185,1.7604,0,0,0,0.8,0.1);
+	this.ground21.alpha = 0;
+
+	this.ground20 = new lib.ground();
+	this.ground20.name = "ground20";
+	this.ground20.setTransform(8381.9,457.55,0.0527,2.3756,0,0,0,0,0.2);
+	this.ground20.alpha = 0;
+
+	this.ground19 = new lib.ground();
+	this.ground19.name = "ground19";
+	this.ground19.setTransform(8217.7,575.1,0.0958,1.7604,0,0,0,0.5,0.1);
+	this.ground19.alpha = 0;
+
 	this.ground18 = new lib.ground();
 	this.ground18.name = "ground18";
-	this.ground18.setTransform(14003.8,657.45,0.7774,1.7349,0,0,0,-0.4,0.8);
+	this.ground18.setTransform(7761,575.1,0.1287,1.7604,0,0,0,0.4,0.1);
 	this.ground18.alpha = 0;
 
 	this.ground17 = new lib.ground();
 	this.ground17.name = "ground17";
-	this.ground17.setTransform(13546.2,573.35,0.2592,2.1523,0,0,0,-0.2,0.8);
+	this.ground17.setTransform(6761.55,654.1,0.4865,1.7604,0,0,0,0.2,0.1);
 	this.ground17.alpha = 0;
 
 	this.ground16 = new lib.ground();
 	this.ground16.name = "ground16";
-	this.ground16.setTransform(13080.4,573.35,0.1307,2.1523,0,0,0,0,0.8);
+	this.ground16.setTransform(6668.45,540.55,0.0527,2.3756,0,0,0,0,0.2);
 	this.ground16.alpha = 0;
 
 	this.ground15 = new lib.ground();
 	this.ground15.name = "ground15";
-	this.ground15.setTransform(11514.55,649.2,0.8866,1.7819,0,0,0,0.1,0.7);
+	this.ground15.setTransform(6486.1,654.1,0.1021,1.7604,0,0,0,0,0.1);
 	this.ground15.alpha = 0;
 
 	this.ground14 = new lib.ground();
 	this.ground14.name = "ground14";
-	this.ground14.setTransform(11087.25,509.1,0.1748,2.4908,0,0,0,0.6,0.7);
+	this.ground14.setTransform(6053.5,513.25,0.1729,2.4488,0,0,0,0,0.2);
 	this.ground14.alpha = 0;
 
 	this.ground13 = new lib.ground();
 	this.ground13.name = "ground13";
-	this.ground13.setTransform(10784.5,575.4,0.1714,2.135,0,0,0,0.6,0.6);
+	this.ground13.setTransform(5627.85,585.3,0.1729,2.0842,0,0,0,0,0.2);
 	this.ground13.alpha = 0;
 
 	this.ground12 = new lib.ground();
 	this.ground12.name = "ground12";
-	this.ground12.setTransform(8684.35,655.25,1.1402,1.7276,0,0,0,0.7,0.5);
+	this.ground12.setTransform(4813.7,654.1,0.4145,1.7604,0,0,0,0,0.1);
 	this.ground12.alpha = 0;
 
 	this.ground11 = new lib.ground();
 	this.ground11.name = "ground11";
-	this.ground11.setTransform(8225,575.05,0.2601,2.1538,0,0,0,1,0.4);
+	this.ground11.setTransform(4250.85,654.1,0.2314,1.7604,0,0,0,0,0.1);
 	this.ground11.alpha = 0;
 
 	this.ground10 = new lib.ground();
 	this.ground10.name = "ground10";
-	this.ground10.setTransform(7765.15,572.55,0.1316,2.1538,0,0,0,0.8,0.3);
+	this.ground10.setTransform(3808.25,652.3,0.1753,1.7604,0,0,0,0,0.1);
 	this.ground10.alpha = 0;
 
 	this.ground9 = new lib.ground();
 	this.ground9.name = "ground9";
-	this.ground9.setTransform(6488.1,652.55,0.6456,1.7607,0,0,0,0.6,0.3);
+	this.ground9.setTransform(3714.2,532.55,0.0527,2.3756,0,0,0,0,0.2);
 	this.ground9.alpha = 0;
 
 	this.ground8 = new lib.ground();
 	this.ground8.name = "ground8";
-	this.ground8.setTransform(6058.25,512.05,0.1749,2.4486,0,0,0,0.3,0.1);
+	this.ground8.setTransform(3488.65,652.3,0.1277,1.7604,0,0,0,0,0.1);
 	this.ground8.alpha = 0;
 
 	this.ground7 = new lib.ground();
 	this.ground7.name = "ground7";
-	this.ground7.setTransform(5628.6,580.25,0.1749,2.1239,0,0,0,0.3,0.1);
+	this.ground7.setTransform(3157.15,652.3,0.0892,1.7604,0,0,0,0,0.1);
 	this.ground7.alpha = 0;
 
 	this.ground6 = new lib.ground();
 	this.ground6.name = "ground6";
-	this.ground6.setTransform(4817.45,652.35,0.4114,1.7586,0,0,0,0.2,0.1);
+	this.ground6.setTransform(2563.25,652.3,0.2615,1.7604,0,0,0,0,0.1);
 	this.ground6.alpha = 0;
 
 	this.ground5 = new lib.ground();
 	this.ground5.name = "ground5";
-	this.ground5.setTransform(4257.25,652.35,0.2306,1.7586,0,0,0,0.2,0.1);
+	this.ground5.setTransform(2470.2,532.55,0.0527,2.3756,0,0,0,0,0.2);
 	this.ground5.alpha = 0;
 
 	this.ground4 = new lib.ground();
 	this.ground4.name = "ground4";
-	this.ground4.setTransform(3492.25,652.35,0.358,1.7586,0,0,0,0.1,0.1);
+	this.ground4.setTransform(2241.85,652.3,0.1295,1.7604,0,0,0,0,0.1);
 	this.ground4.alpha = 0;
 
 	this.ground3 = new lib.ground();
 	this.ground3.name = "ground3";
-	this.ground3.setTransform(3160.9,652.15,0.1102,1.7586);
+	this.ground3.setTransform(1851.25,569.55,0.1726,2.1801,0,0,0,0,0.2);
 	this.ground3.alpha = 0;
 
 	this.ground2 = new lib.ground();
 	this.ground2.name = "ground2";
-	this.ground2.setTransform(2246.2,652.25,0.4432,1.7401,0,0,0,0,0.1);
+	this.ground2.setTransform(1496.75,652.3,0.1483,1.7604,0,0,0,0,0.1);
 	this.ground2.alpha = 0;
 
 	this.ground1 = new lib.ground();
 	this.ground1.name = "ground1";
-	this.ground1.setTransform(1852.65,567.1,0.1743,2.1559,0,0,0,2.3,0.1);
+	this.ground1.setTransform(1405.65,532.55,0.0527,2.3756,0,0,0,0,0.2);
 	this.ground1.alpha = 0;
 
 	this.ground0 = new lib.ground();
 	this.ground0.name = "ground0";
-	this.ground0.setTransform(0,652.1,0.9976,1.7604);
+	this.ground0.setTransform(0,652.3,0.7955,1.7604,0,0,0,0,0.1);
 	this.ground0.alpha = 0;
 
-	this.timeline.addTween(cjs.Tween.get({}).to({state:[{t:this.ground0},{t:this.ground1},{t:this.ground2},{t:this.ground3},{t:this.ground4},{t:this.ground5},{t:this.ground6},{t:this.ground7},{t:this.ground8},{t:this.ground9},{t:this.ground10},{t:this.ground11},{t:this.ground12},{t:this.ground13},{t:this.ground14},{t:this.ground15},{t:this.ground16},{t:this.ground17},{t:this.ground18}]}).wait(1));
+	this.timeline.addTween(cjs.Tween.get({}).to({state:[{t:this.ground0},{t:this.ground1},{t:this.ground2},{t:this.ground3},{t:this.ground4},{t:this.ground5},{t:this.ground6},{t:this.ground7},{t:this.ground8},{t:this.ground9},{t:this.ground10},{t:this.ground11},{t:this.ground12},{t:this.ground13},{t:this.ground14},{t:this.ground15},{t:this.ground16},{t:this.ground17},{t:this.ground18},{t:this.ground19},{t:this.ground20},{t:this.ground21},{t:this.ground22},{t:this.ground23},{t:this.ground24},{t:this.ground25},{t:this.ground26},{t:this.ground27},{t:this.ground28},{t:this.ground29},{t:this.ground30},{t:this.ground31},{t:this.ground32},{t:this.ground33},{t:this.ground34}]}).wait(1));
 
 	// img
 	this.instance = new lib.Symbol124("synched",0);
@@ -1235,7 +1284,7 @@ if (reversed == null) { reversed = false; }
 
 	this._renderFirstFrame();
 
-}).prototype = getMCSymbolPrototype(lib.map, new cjs.Rectangle(-0.2,125,15377.6,875.9), null);
+}).prototype = getMCSymbolPrototype(lib.map, new cjs.Rectangle(-0.2,125,15372.5,889.6), null);
 
 
 (lib.item = function(mode,startPosition,loop,reversed) {
@@ -1595,33 +1644,6 @@ if (reversed == null) { reversed = false; }
 	props.reversed = reversed;
 	cjs.MovieClip.apply(this,[props]);
 
-	// stone
-	this.instance = new lib.Symbol21("single",1);
-	this.instance.setTransform(14312.75,-58.15,1,1,0,0,0,75.8,61.4);
-
-	this.instance_1 = new lib.Symbol21("single",1);
-	this.instance_1.setTransform(11895.3,-55.95,1,1,0,0,0,75.8,61.4);
-
-	this.instance_2 = new lib.Symbol21("single",1);
-	this.instance_2.setTransform(9932.65,-54.15,1,1,0,0,0,75.8,61.4);
-
-	this.instance_3 = new lib.Symbol21("single",1);
-	this.instance_3.setTransform(8440.85,-138.55,1,1,0,0,0,75.8,61.4);
-
-	this.instance_4 = new lib.Symbol21("single",1);
-	this.instance_4.setTransform(6722.15,-56.15,1,1,0,0,0,75.8,61.4);
-
-	this.instance_5 = new lib.Symbol21("single",1);
-	this.instance_5.setTransform(3770.65,-56.55,1,1,0,0,0,75.8,61.4);
-
-	this.instance_6 = new lib.Symbol21("single",1);
-	this.instance_6.setTransform(2521.75,-61.95,1,1,0,0,0,75.8,61.4);
-
-	this.instance_7 = new lib.Symbol21("single",1);
-	this.instance_7.setTransform(1459.55,-61.95,1,1,0,0,0,75.8,61.4);
-
-	this.timeline.addTween(cjs.Tween.get({}).to({state:[{t:this.instance_7},{t:this.instance_6},{t:this.instance_5},{t:this.instance_4},{t:this.instance_3},{t:this.instance_2},{t:this.instance_1},{t:this.instance}]}).wait(1));
-
 	// character
 	this.character = new lib.character();
 	this.character.name = "character";
@@ -1760,7 +1782,7 @@ if (reversed == null) { reversed = false; }
 
 	this._renderFirstFrame();
 
-}).prototype = getMCSymbolPrototype(lib.gameCon, new cjs.Rectangle(-0.2,-533,15377.6,875.9), null);
+}).prototype = getMCSymbolPrototype(lib.gameCon, new cjs.Rectangle(-0.2,-533,15372.5,889.6), null);
 
 
 // stage content:
@@ -1785,7 +1807,7 @@ if (reversed == null) { reversed = false; }
 	this._renderFirstFrame();
 
 }).prototype = p = new lib.AnMovieClip();
-p.nominalBounds = new cjs.Rectangle(639.8,232.4,14737.6,558.3000000000001);
+p.nominalBounds = new cjs.Rectangle(639.8,232.4,14732.5,572);
 // library properties:
 lib.properties = {
 	id: '8743311584CF0446BC7E243C0BD710EC',
