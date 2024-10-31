@@ -43,14 +43,14 @@ CustomWiggle.create("wiggle", {wiggles: 3, type:"linear"});
         }
 
         function checkFront () {
+            var arrow = this.tar.right;
+            if(this.tar.tar.scaleX < 0) arrow = this.tar.left;
             var rect1 = {
                 x: this.tar.x + arrow.x, 
                 y: this.tar.y + arrow.y + 756, 
                 width: arrow.nominalBounds.width * arrow.scaleX,
                 height: arrow.nominalBounds.height * arrow.scaleY,
             }
-            var arrow = this.tar.right;
-            if(this.tar.tar.scaleX < 0) arrow = this.tar.left;
             for (var i= 0; i < this.map.numChildren; i++) {
                 var m = this.map.getChildAt(i);    
                 if(String(m.name).includes("ground")) {
