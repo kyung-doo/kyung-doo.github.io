@@ -30,7 +30,7 @@
 
 #game .map .map-img > img {
    position: absolute;
-   top: -33px;
+   top: -85px;
 }
 #game .map .map-img > img:nth-child(1) {
    left: 0px;
@@ -68,6 +68,379 @@
 #game .map .map-img > img:nth-child(12) {
    left: 14069px;
 }
+
+#game .character {
+   position: absolute;
+   left: 0;
+   top: 0;
+}
+#game .character .char {
+   position: absolute;
+   left: -75px;
+   top: -203px;
+   width: 150px;
+   height: 250px;
+   /* border: solid 1px red; */
+}
+#game .character .area {
+   position: absolute;
+   left: -52px;
+   top: -183px;
+   width: 103px;
+   height: 229px;
+   /* border: solid 1px red; */
+}
+
+#game .character .bottom {
+   position: absolute;
+   left: -10px;
+   top: 49px;
+   width: 20px;
+   height: 20px;
+   /* border: solid 1px blue; */
+}
+#game .character .left {
+   position: absolute;
+   left: -37px;
+   top: -12px;
+   width: 20px;
+   height: 20px;
+   /* border: solid 1px blue; */
+}
+#game .character .right {
+   position: absolute;
+   left: 9px;
+   top: -12px;
+   width: 20px;
+   height: 20px;
+   /* border: solid 1px blue; */
+}
+
+#game .map .ground {
+   position: absolute;
+   /* border: solid 1px red; */
+}
+#game .map .ground:nth-child(1) {
+   left: 0;
+   top: 444px;
+   width: 1408px;
+   height: 350px;
+}
+#game .map .ground:nth-child(2) {
+   left: 1409px;
+   top: 322px;
+   width: 89px;
+   height: 471px;
+}
+#game .map .ground:nth-child(3) {
+   left: 1499px;
+   top: 444px;
+   width: 259px;
+   height: 350px;
+}
+#game .map .ground:nth-child(4) {
+   left: 1850px;
+   top: 357px;
+   width: 304px;
+   height: 433px;
+}
+#game .map .ground:nth-child(5) {
+   left: 2243px;
+   top: 444px;
+   width: 223px;
+   height: 350px;
+}
+#game .map .ground:nth-child(6) {
+   left: 2467px;
+   top: 322px;
+   width: 89px;
+   height: 471px;
+}
+#game .map .ground:nth-child(7) {
+   left: 2557px;
+   top: 444px;
+   width: 467px;
+   height: 350px;
+}
+#game .map .ground:nth-child(8) {
+   left: 3156px;
+   top: 444px;
+   width: 158px;
+   height: 350px;
+}
+#game .map .ground:nth-child(9) {
+   left: 3489px;
+   top: 444px;
+   width: 231px;
+   height: 350px;
+}
+#game .map .ground:nth-child(10) {
+   left: 3720px;
+   top: 322px;
+   width: 89px;
+   height: 471px;
+}
+#game .map .ground:nth-child(11) {
+   left: 3810px;
+   top: 444px;
+   width: 308px;
+   height: 350px;
+}
+#game .map .ground:nth-child(12) {
+   left: 4251px;
+   top: 444px;
+   width: 408px;
+   height: 350px;
+}
+#game .map .ground:nth-child(13) {
+   left: 4816px;
+   top: 444px;
+   width: 727px;
+   height: 350px;
+}
+#game .map .ground:nth-child(14) {
+   left: 5627px;
+   top: 374px;
+   width: 305px;
+   height: 419px;
+}
+#game .map .ground:nth-child(15) {
+   left: 6053px;
+   top: 304px;
+   width: 305px;
+   height: 419px;
+}
+#game .map .ground:nth-child(16) {
+   left: 6486px;
+   top: 444px;
+   width: 183px;
+   height: 350px;
+}
+#game .map .ground:nth-child(17) {
+   left: 6670px;
+   top: 322px;
+   width: 89px;
+   height: 471px;
+}
+#game .map .ground:nth-child(18) {
+   left: 6760px;
+   top: 444px;
+   width: 863px;
+   height: 350px;
+}
+#game .map .ground:nth-child(19) {
+   left: 7760px;
+   top: 364px;
+   width: 226px;
+   height: 350px;
+}
+#game .map .ground:nth-child(20) {
+   left: 8216px;
+   top: 364px;
+   width: 167px;
+   height: 350px;
+}
+#game .map .ground:nth-child(21) {
+   left: 8384px;
+   top: 244px;
+   width: 89px;
+   height: 471px;
+}
+#game .map .ground:nth-child(22) {
+   left: 8474px;
+   top: 364px;
+   width: 208px;
+   height: 350px;
+}
+#game .map .ground:nth-child(23) {
+   left: 8683px;
+   top: 444px;
+   width: 1195px;
+   height: 350px;
+}
+#game .map .ground:nth-child(24) {
+   left: 9879px;
+   top: 329px;
+   width: 89px;
+   height: 471px;
+}
+#game .map .ground:nth-child(25) {
+   left: 9969px;
+   top: 444px;
+   width: 722px;
+   height: 350px;
+}
+#game .map .ground:nth-child(26) {
+   left: 10774px;
+   top: 374px;
+   width: 306px;
+   height: 420px;
+}
+#game .map .ground:nth-child(27) {
+   left: 11081px;
+   top: 302px;
+   width: 306px;
+   height: 490px;
+}
+#game .map .ground:nth-child(28) {
+   left: 11505px;
+   top: 444px;
+   width: 334px;
+   height: 350px;
+}
+#game .map .ground:nth-child(29) {
+   left: 11840px;
+   top: 329px;
+   width: 89px;
+   height: 471px;
+}
+#game .map .ground:nth-child(30) {
+   left: 11929px;
+   top: 444px;
+   width: 1144px;
+   height: 350px;
+}
+#game .map .ground:nth-child(31) {
+   left: 13074px;
+   top: 366px;
+   width: 225px;
+   height: 430px;
+}
+#game .map .ground:nth-child(32) {
+   left: 13530px;
+   top: 366px;
+   width: 465px;
+   height: 430px;
+}
+#game .map .ground:nth-child(33) {
+   left: 13997px;
+   top: 444px;
+   width: 255px;
+   height: 350px;
+}
+#game .map .ground:nth-child(34) {
+   left: 14253px;
+   top: 329px;
+   width: 89px;
+   height: 471px;
+}
+#game .map .ground:nth-child(35) {
+   left: 14343px;
+   top: 444px;
+   width: 1000px;
+   height: 350px;
+}
+
+
+
+#game .items .item {
+   position: absolute;
+   width: 54px;
+   height: 65px;
+   background: url('../images/item.png') no-repeat;
+   background-size: 100%;
+}
+#game .items .item:nth-child(1) {
+   left: 1978px;
+   top: 69px;
+}
+#game .items .item:nth-child(2) {
+   left: 2347px;
+   top: 178px;
+}
+#game .items .item:nth-child(3) {
+   left: 3223px;
+   top: 214px;
+}
+#game .items .item:nth-child(4) {
+   left: 3297px;
+   top: 145px;
+}
+#game .items .item:nth-child(5) {
+   left: 3397px;
+   top: 97px;
+}
+#game .items .item:nth-child(6) {
+   left: 3483px;
+   top: 145px;
+}
+#game .items .item:nth-child(7) {
+   left: 3568px;
+   top: 214px;
+}
+#game .items .item:nth-child(8) {
+   left: 5712px;
+   top: 134px;
+}
+#game .items .item:nth-child(9) {
+   left: 6170px;
+   top: 65px;
+}
+#game .items .item:nth-child(10) {
+   left: 6680px;
+   top: 109px;
+}
+#game .items .item:nth-child(11) {
+   left: 6957px;
+   top: 204px;
+}
+#game .items .item:nth-child(12) {
+   left: 8395px;
+   top: 87px;
+}
+#game .items .item:nth-child(13) {
+   left: 9904px;
+   top: 134px;
+}
+#game .items .item:nth-child(14) {
+   left: 10061px;
+   top: 226px;
+}
+#game .items .item:nth-child(15) {
+   left: 10900px;
+   top: 109px;
+}
+#game .items .item:nth-child(16) {
+   left: 11185px;
+   top: 39px;
+}
+#game .items .item:nth-child(17) {
+   left: 11647px;
+   top: 204px;
+}
+#game .items .item:nth-child(18) {
+   left: 12716px;
+   top: 204px;
+}
+#game .items .item:nth-child(19) {
+   left: 13201px;
+   top: 156px;
+}
+#game .items .item:nth-child(20) {
+   left: 13286px;
+   top: 69px;
+}
+#game .items .item:nth-child(21) {
+   left: 13378px;
+   top: 17px;
+}
+#game .items .item:nth-child(22) {
+   left: 13515px;
+   top: 69px;
+}
+#game .items .item:nth-child(23) {
+   left: 13577px;
+   top: 156px;
+}
+#game .items .item:nth-child(24) {
+   left: 14107px;
+   top: 226px;
+}
+
+
+
+
+
 
 /* #game .audio-warnning {
    position: absolute;
