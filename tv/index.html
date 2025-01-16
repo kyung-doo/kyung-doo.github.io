@@ -54,6 +54,15 @@
                 background-color: #000;
             }
         </style>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+        <script type="text/javascript">
+            function popKBS(a) {
+                var b = "";
+                $.getJSON("https://cfpwwwapi.kbs.co.kr/api/v1/landing/live/channel_code/" + a, function(a) {
+                    window.open(a.channel_item[0].service_url, '_blank');
+                });
+            }
+        </script>
     </head>
     <body>
         <div id="wrap">
@@ -73,6 +82,7 @@
                 <div class="box"><a onclick="window.open('https://tinyurl.com/pfxxzsj3','_blank'); return false;">티비조선<br />(TV조선)</a></div>
                 <div class="box"><a onclick="window.open('https://rb.gy/telq1m','_blank'); return false;">연합뉴스TV</a></div>
                 <div class="box"><a onclick="window.open('https://sporki.com/billiards/game/9491','_blank'); return false;">당구</a></div>
+                <div class="box"><a onclick="popKBS('nvod8');">역사</a></div>
 
                 
                 
