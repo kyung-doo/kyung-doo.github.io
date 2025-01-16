@@ -42,11 +42,13 @@
                         hls.loadSource(videoSrc);
                         hls.attachMedia(video);
                         hls.startLoad();
+                        hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
+                            video.play();
+                        });
                     }
                     else {
                         video.src = videoSrc;	
                     }
-                    video.play();
                 });
             });
         </script>
