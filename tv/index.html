@@ -55,18 +55,6 @@
             }
         </style>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-        <script type="text/javascript">
-            function popKBS(a) {
-                var b = "";
-                $.getJSON("https://cfpwwwapi.kbs.co.kr/api/v1/landing/live/channel_code/" + a, function(a) {
-                    console.log(a.channel_item[0].service_url)
-                    // var win = window.open('./video.html', '_blank');
-                    // win.addEventListener('load', () => {
-                    //     win.playVideo(a.channel_item[0].service_url);
-                    // });
-                });
-            }
-        </script>
     </head>
     <body>
         <div id="wrap">
