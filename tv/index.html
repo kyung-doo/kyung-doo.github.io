@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="ko">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width">
+        <title>문태수 티비</title>
+        <style type="text/css" rel="stylesheet">
+            * {
+                padding: 0;
+                margin: 0;
+            }
+            html, body {
+                background-color: #333;
+            }
+            #wrap {
+                padding: 10px;
+            }
+            .boxs {
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr;
+                grid-template-rows: 1fr 1fr 1fr;
+                box-sizing: border-box;
+            }
+            .box {
+                margin: 5px;
+                height: 30vw;
+                border-radius: 10px;
+                background-color: #fff;
+            }
+            .box > a {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 100%;
+                height: 100%;
+                font-size: 30px;
+                font-weight: 800;
+                text-align: center;
+            }
+            #video-popup {
+                position: fixed;
+                display: none;
+                width: 100%;
+                height: 100%;
+                background-color: #000;
+            }
+            #video-popup > video {
+                width: 100%;
+                height: 100%;
+                background-color: #000;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="wrap">
+            <div class="boxs">
+                <div class="box"><a onclick="window.open('https://tinyurl.com/4epebczb','_blank'); return false;">케이비에스1<br />(KBS1)</a></div>
+                <div class="box"><a onclick="window.open('https://tinyurl.com/bdhdwjv9','_blank'); return false;">케이비에스2<br />(KBS2)</a></div>
+                <div class="box"><a onclick="window.open('https://tinyurl.com/3sekv4z4','_blank'); return false;">케이비에스 뉴스</a></div>
+                <div class="box"><a onclick="window.open('https://tinyurl.com/nhkzt874','_blank'); return false;">케이비에스 드라마</a></div>
+                <div class="box"><a onclick="window.open('https://tinyurl.com/mr3ae29k','_blank'); return false;">엠비씨<br />(MBC)</a></div>
+                <div class="box"><a onclick="window.open('https://tinyurl.com/4p7nd5u5','_blank'); return false;">에스비에스<br />(SBS)</a></div>
+                <div class="box"><a onclick="window.open('https://tinyurl.com/yc4p884k','_blank'); return false;">에스비에스 플러스</a></div>
+                <div class="box"><a onclick="window.open('https://tinyurl.com/39rv2xs4','_blank'); return false;">에스비에스 스포츠</a></div>
+                <div class="box"><a onclick="window.open('https://ebsonair.ebs.co.kr/groundwavefamilypc/familypc1m/playlist.m3u8','_blank'); return false;">이비에스1<br />(EBS1)</a></div>
+                <div class="box"><a onclick="window.open('https://ebsonair.ebs.co.kr/ebs2familypc/familypc1m/playlist.m3u8','_blank'); return false;">이비에스2<br />(EBS2)</a></div>
+                <div class="box"><a onclick="window.open('https://rb.gy/7d13cj','_blank'); return false;">와이티엔<br />(YTN)</a></div>
+                <div class="box"><a onclick="window.open('https://rb.gy/7d13cj','_blank'); return false;">와이티엔<br />(YTN)</a></div>
+                <div class="box"><a onclick="window.open('https://tinyurl.com/3rzckfep','_blank'); return false;">제이티비씨<br />(JTBC)</a></div>
+                <div class="box"><a onclick="window.open('https://tinyurl.com/pfxxzsj3','_blank'); return false;">티비조선<br />(TV조선)</a></div>
+                <div class="box"><a onclick="window.open('https://rb.gy/telq1m','_blank'); return false;">연합뉴스TV</a></div>
+                <div class="box"><a onclick="window.open('https://sporki.com/billiards/game/9491','_blank'); return false;">당구</a></div>
+
+                
+                
+                
+            </div>
+            <div id="video-popup"></div>
+        </div>
+    </body>
+</html>
