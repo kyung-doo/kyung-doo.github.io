@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="ko">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width">
+        <title>문태수 티비</title>
+        <style type="text/css" rel="stylesheet">
+            * {
+                padding: 0;
+                margin: 0;
+            }
+            html, body {
+                width: 100%;
+                height: 100%;
+                background-color: #333;
+            }
+            #wrap {
+                width: 100%;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            #video {
+                width: 100%;
+                height: 100%;
+                background-color: #000;
+            }
+        </style>
+        <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+        <script type="text/javascript">
+            window.playVideo = function ( videoSrc ) {
+                const video = document.querySelector('#video');
+                if (Hls.isSupported()) {
+                    hls = new Hls({
+                        autoStartLoad: false,
+                    });
+                    hls.loadSource(videoSrc);
+                    hls.attachMedia(video);
+                    hls.startLoad();
+                }
+                else {
+                    video.src = videoSrc;	
+                }
+            }
+        </script>
+    </head>
+    <body>
+        <div id="wrap">
+            <video id="video" controls autoplay></video>
+        </div>
+    </body>
+</html>

@@ -59,7 +59,10 @@
             function popKBS(a) {
                 var b = "";
                 $.getJSON("https://cfpwwwapi.kbs.co.kr/api/v1/landing/live/channel_code/" + a, function(a) {
-                    window.open(a.channel_item[0].service_url, '_blank');
+                    var win = window.open('./video.html', '_blank');
+                    win.addEventListener('load', () => {
+                        win.playVideo(a.channel_item[0].service_url);
+                    });
                 });
             }
         </script>
@@ -83,10 +86,6 @@
                 <div class="box"><a onclick="window.open('https://rb.gy/telq1m','_blank'); return false;">연합뉴스TV</a></div>
                 <div class="box"><a onclick="window.open('https://sporki.com/billiards/game/9491','_blank'); return false;">당구</a></div>
                 <div class="box"><a onclick="popKBS('nvod8');">역사</a></div>
-
-                
-                
-                
             </div>
             <div id="video-popup"></div>
         </div>
