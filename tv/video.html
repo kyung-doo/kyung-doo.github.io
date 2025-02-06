@@ -36,10 +36,15 @@
                     const videoSrc = a.channel_item[0].service_url;
                     const video = document.querySelector('#video');
                     if (Hls.isSupported()) {
-                        hls = new Hls();
+                        hls = new Hls({
+                            autoStartLoad: false,
+                        });
                         hls.loadSource(videoSrc);
                         hls.attachMedia(video);
                         hls.startLoad();
+                        hls.on(Hls.Events.MEDIA_ATTACHED, function () {
+                            video.play();
+                        });
                     }
                     else {
                         video.src = videoSrc;	
