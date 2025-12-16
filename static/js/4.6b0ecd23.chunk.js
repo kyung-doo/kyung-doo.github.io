@@ -1,0 +1,2 @@
+(this["webpackJsonplittle-fox-game"]=this["webpackJsonplittle-fox-game"]||[]).push([[4],{143:function(t,e,i){"use strict";i.r(e),e.default=i.p+"static/media/wrong4.495ef702.mp3"},731:function(t,e,i){}}]);
+//# sourceMappingURL=4.6b0ecd23.chunk.js.map
