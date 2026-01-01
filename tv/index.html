@@ -59,14 +59,14 @@
     <body>
         <div id="wrap">
             <div class="boxs">
-                <div class="box"><a onclick="window.open('https://tinyurl.com/4epebczb','_blank');">케이비에스1<br />(KBS1)</a></div>
-                <div class="box"><a onclick="window.open('https://tinyurl.com/bdhdwjv9','_blank');">케이비에스2<br />(KBS2)</a></div>
+                <div class="box"><a onclick="popKBSOven('11');">케이비에스1<br />(KBS1)</a></div>
+                <div class="box"><a onclick="popKBSOven('12');">케이비에스2<br />(KBS2)</a></div>
                 <div class="box"><a onclick="window.open('https://tinyurl.com/3sekv4z4','_blank');">케이비에스 뉴스</a></div>
                 <div class="box"><a onclick="window.open('https://tinyurl.com/nhkzt874','_blank');">케이비에스 드라마</a></div>
-                <div class="box"><a onclick="window.open('https://is.gd/CHmOTX','_blank');">엠비씨<br />(MBC)</a></div>
-                <div class="box"><a onclick="window.open('https://tinyurl.com/4p7nd5u5','_blank');">에스비에스<br />(SBS)</a></div>
-                <div class="box"><a onclick="window.open('https://tinyurl.com/yc4p884k','_blank');">에스비에스 플러스</a></div>
-                <div class="box"><a onclick="window.open('https://tinyurl.com/39rv2xs4','_blank');">에스비에스 스포츠</a></div>
+                <div class="box"><a onclick="window.open('https://is.gd/RxTgN1','_blank');">엠비씨<br />(MBC)</a></div>
+                <div class="box"><a onclick="window.open('https://is.gd/qqsrea','_blank');">에스비에스<br />(SBS)</a></div>
+                <div class="box"><a onclick="window.open('https://is.gd/gnGB2d','_blank');">에스비에스 플러스</a></div>
+                <div class="box"><a onclick="window.open('https://is.gd/k3Jfo8','_blank');">에스비에스 스포츠</a></div>
                 <div class="box"><a onclick="window.open('https://ebsonair.ebs.co.kr/groundwavefamilypc/familypc1m/playlist.m3u8','_blank');">이비에스1<br />(EBS1)</a></div>
                 <div class="box"><a onclick="window.open('https://ebsonair.ebs.co.kr/ebs2familypc/familypc1m/playlist.m3u8','_blank');">이비에스2<br />(EBS2)</a></div>
                 <div class="box"><a onclick="window.open('https://rb.gy/7d13cj','_blank');">와이티엔<br />(YTN)</a></div>
@@ -78,5 +78,130 @@
             </div>
             <div id="video-popup"></div>
         </div>
+        <script>
+            function popKBS(a) {
+    var b = "";
+    $.getJSON("https://cfpwwwapi.kbs.co.kr/api/v1/landing/live/channel_code/" + a, function(a) {
+        b = a.channel_item[0].service_url;
+        openURL(b)
+    })
+}
+function popKBSOven(a) {
+    var b = "";
+    $.getJSON("https://cfpwwwapi.kbs.co.kr/api/v1/landing/live/channel_code/" + a, function(a) {
+        b = a.channel_item[0].service_url;
+        openURLOven(b)
+    })
+}
+function popKBSRadioBora(a) {
+    var b = "";
+    $.getJSON("https://cfpwwwapi.kbs.co.kr/api/v1/landing/live/channel_code/" + a, function(a) {
+        b = a.channel_item[1].service_url;
+        openURL(b)
+    })
+}
+function popKBSRadioBoraOven(a) {
+    var b = "";
+    $.getJSON("https://cfpwwwapi.kbs.co.kr/api/v1/landing/live/channel_code/" + a, function(a) {
+        b = a.channel_item[1].service_url;
+        openURLOven(b)
+    })
+}
+function popKBSNews(a) {
+    var b = "";
+    $.getJSON("https://api.tv.naver.com/api/open/live/v2/player/playback?liveId=12505503&countryCode=KR&timeMachine=true", function(a) {
+        b = a.media[0].path;
+        openURL(b)
+    })
+}
+function popYTN(a) {
+    var b = "";
+    $.getJSON("https://api.tv.naver.com/api/open/live/v2/player/playback?liveId=3790216&countryCode=KR&timeMachine=true", function(a) {
+        b = a.media[0].path;
+        openURL(b)
+    })
+}
+function popYonhap(a) {
+    var b = "";
+    $.getJSON("https://api.tv.naver.com/api/open/live/v2/player/playback?liveId=4087407&countryCode=KR&timeMachine=true", function(a) {
+        b = a.media[0].path;
+        openURL(b)
+    })
+}
+function popSBSNews(a) {
+    var b = "";
+    var c = "";
+    $.getJSON("https://api-gw.sbsdlab.co.kr/v1/news_front_api/live/youtubeliveid", function(a) {
+        if (typeof a.Message !== 'undefined') {
+            c = 'https://news.sbs.co.kr/news/live.do?plink=GNB&cooper=SBSNEWS'
+        } else {
+            b = JSON.parse(a);
+            if (b.liveID != null && b.liveID !== '') {
+                c = 'https://www.youtube.com/embed/' + b.liveID + '?autoplay=1'
+            } else {
+                c = 'https://news.sbs.co.kr/news/live.do?plink=GNB&cooper=SBSNEWS'
+            }
+        }
+        ;openURL(c)
+    })
+}
+function popMBN(a) {
+    $.ajaxSetup({
+        async: false
+    });
+    $.ajax({
+        url: "https://www.mbn.co.kr/player/mbnStreamAuth_new_live.mbn?vod_url=https://hls-live.mbn.co.kr/mbn-on-air/600k/playlist.m3u8",
+        dataType: "text",
+        success: function(a) {
+            b = a
+        }
+        .bind(this)
+    });
+    openURL(b)
+}
+function popMBNOven(a) {
+    $.ajaxSetup({
+        async: false
+    });
+    $.ajax({
+        url: "https://www.mbn.co.kr/player/mbnStreamAuth_new_live.mbn?vod_url=https://hls-live.mbn.co.kr/mbn-on-air/600k/playlist.m3u8",
+        dataType: "text",
+        success: function(a) {
+            b = a
+        }
+        .bind(this)
+    });
+    openURLOven(b)
+}
+function popCATV(a) {
+    var b = "";
+    $.getJSON("https://adm.hi365.to/tv/api/getApi.php?gubun=url&action=get&code=" + a, function(json) {
+        var obj = JSON.stringify(json);
+        var obj1 = JSON.parse(obj);
+        b = JSON.parse(obj1[0].urls);
+        sessionStorage.setItem("b", JSON.stringify(obj1));
+        openURL(b[0].url)
+    })
+}
+function popCATV(a) {
+    var b = "";
+    $.getJSON("https://adm.hi365.to/tv/api/getApi.php?gubun=url&action=get&code=" + a, function(json) {
+        var obj = JSON.stringify(json);
+        var obj1 = JSON.parse(obj);
+        b = JSON.parse(obj1[0].urls);
+        sessionStorage.setItem("b", JSON.stringify(obj1));
+        openURL(b[0].url)
+    })
+}
+function openURL(a) {
+    window.open(a, "_blank");
+    return !1
+}
+function openURLOven(a) {
+    window.open("https://tistory1.daumcdn.net/tistory/2120872/skin/images/ovenplayer.html#" + a, "_blank");
+    return !1
+}
+;
+        </script>
     </body>
 </html>
