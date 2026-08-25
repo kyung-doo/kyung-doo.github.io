@@ -286,7 +286,7 @@
           }
           loadParentFolders(folders[0].id);
         } catch (err) {
-          console.error(err);
+          console.error("만화 폴더 탐색 에러:", err);
         }
       }
 
@@ -307,7 +307,7 @@
             parentFolderSelect.appendChild(opt);
           });
         } catch (err) {
-          console.error(err);
+          console.error("작품 폴더 로드 에러:", err);
         }
       }
 
@@ -330,11 +330,11 @@
             subFolderSelect.appendChild(opt);
           });
         } catch (err) {
-          console.error(err);
+          console.error("권 폴더 로드 에러:", err);
         }
       };
 
-      // 🚀 [속도 개선] 병렬 처리를 통한 고속 이미지 로딩
+      // 🚀 [안정화 및 속도 개선] 모든 이미지 포맷 허용 및 병렬 다운로드
       btnLoadImages.onclick = async () => {
         const selectedFolderId = subFolderSelect.value;
         if (!selectedFolderId) {
@@ -342,28 +342,29 @@
           return;
         }
 
-        viewer.innerHTML = '<p style="padding: 20px;">고속 로딩 중...</p>';
+        viewer.innerHTML = '<p style="padding: 20px; color: #aaa;">이미지 불러오는 중...</p>';
 
         try {
-          const query = `'${selectedFolderId}' in parents and (mimeType = 'image/jpeg' or mimeType = 'image/png') and trashed = false`;
+          // mimeType이 image/로 시작하는 모든 파일 허용 (jpg, png, webp 등)
+          const query = `'${selectedFolderId}' in parents and mimeType contains 'image/' and trashed = false`;
           const response = await gapi.client.drive.files.list({
             q: query,
             orderBy: "name_natural",
             pageSize: 500,
-            fields: "files(id, name)",
+            fields: "files(id, name, mimeType)",
           });
 
           const files = response.result.files;
+          console.log("검색된 이미지 파일들:", files);
           viewer.innerHTML = "";
 
           if (files.length === 0) {
-            viewer.innerHTML = "<p>선택한 폴더에 이미지 파일이 없습니다.</p>";
+            viewer.innerHTML = "<p style='padding: 20px;'>선택한 폴더에 이미지 파일이 없습니다.</p>";
             return;
           }
 
-          // 이미지를 순서대로 유지하면서 동시에 불러오기 (Promise.all 활용)
+          // 개별 이미지 안전 다운로드 함수
           const imagePromises = files.map(async (file) => {
-            const img = document.createElement("img");
             try {
               const imgResponse = await fetch(
                 `https://www.googleapis.com/drive/v3/files/${file.id}?alt=media`,
@@ -371,17 +372,37 @@
                   headers: { Authorization: `Bearer ${accessToken}` },
                 },
               );
+
+              if (!imgResponse.ok) {
+                console.error(`다운로드 실패 (${file.name}): 상태코드 ${imgResponse.status}`);
+                return null;
+              }
+
               const blob = await imgResponse.blob();
+              const img = document.createElement("img");
               img.src = URL.createObjectURL(blob);
+              return img;
             } catch (e) {
-              console.error(`이미지 로드 실패 (${file.name}):`, e);
+              console.error(`이미지 처리 에러 (${file.name}):`, e);
+              return null;
             }
-            return img;
           });
 
-          // 모든 이미지를 병렬로 다운로드 후 순서대로 뷰어에 장착
+          // 병렬 실행 후 성공한 이미지들만 뷰어에 순서대로 추가
           const loadedImages = await Promise.all(imagePromises);
-          loadedImages.forEach((img) => viewer.appendChild(img));
+          let successCount = 0;
+
+          loadedImages.forEach((img) => {
+            if (img) {
+              viewer.appendChild(img);
+              successCount++;
+            }
+          });
+
+          if (successCount === 0) {
+            viewer.innerHTML = "<p style='color: #ff6b6b; padding: 20px;'>이미지를 렌더링하지 못했습니다. (F12 콘솔 확인)</p>";
+            return;
+          }
 
           updateFilters();
         } catch (err) {
