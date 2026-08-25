@@ -236,6 +236,19 @@
         document.getElementById("scrollupBtn").style.display = "none";
       }
 
+      // 🚀 페이지 로드시 저장된 필터 값 복원
+      window.addEventListener('DOMContentLoaded', () => {
+        const savedB = localStorage.getItem('filter_brightness');
+        const savedC = localStorage.getItem('filter_contrast');
+        const savedSh = localStorage.getItem('filter_sharpen');
+
+        if (savedB !== null) document.getElementById("valBrightness").value = savedB;
+        if (savedC !== null) document.getElementById("valContrast").value = savedC;
+        if (savedSh !== null) document.getElementById("valSharpen").value = savedSh;
+        
+        updateFilters(); // 초기값 반영
+      });
+
       window.onload = () => {
         gapi.load("client", () => {
           gapi.client.init({
@@ -293,7 +306,6 @@
             parentFolderSelect.appendChild(opt);
           });
 
-          // 🚀 저장된 이전 작품이 있다면 자동 선택 및 권 목록 로드
           const savedParent = localStorage.getItem('last_parent_folder');
           if (savedParent) {
             parentFolderSelect.value = savedParent;
@@ -318,7 +330,6 @@
             subFolderSelect.appendChild(opt);
           });
 
-          // 🚀 저장된 권이 있다면 자동 선택 후 불러오기 실행
           if (autoSelect) {
             const savedSub = localStorage.getItem('last_sub_folder');
             if (savedSub) {
@@ -344,7 +355,6 @@
           return;
         }
 
-        // 선택한 작품과 권 정보 저장
         localStorage.setItem('last_parent_folder', parentFolderSelect.value);
         localStorage.setItem('last_sub_folder', selectedFolderId);
 
@@ -399,7 +409,6 @@
 
           loadingStatus.style.display = "none";
 
-          // 다음화 넘기기 버튼 생성
           const nextIndex = subFolderSelect.selectedIndex + 1;
           if (nextIndex < subFolderSelect.options.length) {
             const nextDiv = document.createElement("div");
@@ -452,6 +461,11 @@
         document.getElementById("txtBrightness").innerText = b + "%";
         document.getElementById("txtContrast").innerText = c + "%";
         document.getElementById("txtSharpen").innerText = sh + "%";
+
+        // 🚀 슬라이더 조절할 때마다 localStorage에 값 저장
+        localStorage.setItem('filter_brightness', b);
+        localStorage.setItem('filter_contrast', c);
+        localStorage.setItem('filter_sharpen', sh);
 
         const amount = sh / 50;
         const center = 4 * amount + 1;
