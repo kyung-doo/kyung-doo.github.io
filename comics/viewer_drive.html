@@ -102,7 +102,7 @@
     cursor: pointer;
     box-shadow: 0 4px 10px rgba(0,0,0,0.5);
     z-index: 999;
-    display: none;
+    display: flex;
     justify-content: center;
     align-items: center;
   }
@@ -313,9 +313,6 @@
         img.src = URL.createObjectURL(blob);
         viewer.appendChild(img);
       }
-
-      document.getElementById('scrollDownBtn').style.display = 'flex';
-      document.getElementById('scrollupBtn').style.display = 'flex';
       updateFilters();
 
     } catch (err) {
