@@ -30,22 +30,24 @@
     gap: 10px;
   }
   .btn {
-    padding: 10px 20px;
+    padding: 8px 15px;
     background: #007bff;
     color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: bold;
   }
   .btn:hover { background: #0056b3; }
-  #btnDriveLogin { background-color: #4285F4; }
+  #btnDriveLogin { background-color: #4285F4; font-size: 16px; padding: 10px 20px; }
   
-  #folderSelectContainer {
+  .select-group {
     display: none;
     gap: 10px;
     align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
     margin-top: 5px;
   }
   select {
@@ -55,7 +57,7 @@
     color: white;
     border: 1px solid #555;
     border-radius: 4px;
-    max-width: 300px;
+    max-width: 250px;
   }
 
   .slider-group {
@@ -118,15 +120,22 @@
   </svg>
 
   <div id="controls">
-    <!-- 구글 로그인 및 폴더 선택 영역 -->
     <div>
       <button class="btn" id="btnDriveLogin">🔑 구글 드라이브 로그인</button>
-      <div id="folderSelectContainer">
-        <label for="subFolderSelect" style="font-size: 14px; font-weight: bold;">에피소드 선택:</label>
-        <select id="subFolderSelect">
-          <option value="">-- 상위 폴더를 선택하세요 --</option>
+      
+      <!-- 폴더 선택 영역 ('만화' 폴더 내부의 작품 -> 권 선택) -->
+      <div class="select-group" id="selectContainer">
+        <label style="font-size: 13px; font-weight: bold;">작품:</label>
+        <select id="parentFolderSelect">
+          <option value="">-- 작품 폴더 선택 --</option>
         </select>
-        <button class="btn" id="btnLoadImages" style="padding: 8px 15px; font-size: 14px;">불러오기</button>
+
+        <label style="font-size: 13px; font-weight: bold;">권:</label>
+        <select id="subFolderSelect">
+          <option value="">-- 작품을 먼저 선택하세요 --</option>
+        </select>
+
+        <button class="btn" id="btnLoadImages">불러오기</button>
       </div>
     </div>
     
@@ -143,33 +152,31 @@
   <button id="scrollupBtn">▲</button>
   <button id="scrollDownBtn">▼</button>
 
-  <!-- Google API 스크립트 로드 -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <script src="https://apis.google.com/js/api.js" async defer></script>
 
 <script>
-  // ⚠️ [중요] Google Cloud Console에서 발급받은 본인의 '클라이언트 ID'를 입력하세요.
   const CLIENT_ID = '390191011438-nkn16tv7dnc167fukr55crl0domhsgcf.apps.googleusercontent.com'; 
-  const API_KEY = ''; // 선택 사항 (필요시 입력)
+  const API_KEY = ''; 
   const SCOPES = 'https://www.googleapis.com/auth/drive.readonly';
 
   let tokenClient;
   let accessToken = null;
 
   const btnDriveLogin = document.getElementById('btnDriveLogin');
-  const folderSelectContainer = document.getElementById('folderSelectContainer');
+  const selectContainer = document.getElementById('selectContainer');
+  const parentFolderSelect = document.getElementById('parentFolderSelect');
   const subFolderSelect = document.getElementById('subFolderSelect');
   const btnLoadImages = document.getElementById('btnLoadImages');
   const viewer = document.getElementById('viewer');
 
-  // Google API 초기화
   window.onload = () => {
     gapi.load('client', () => {
       gapi.client.init({
         apiKey: API_KEY,
         discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
       }).then(() => {
-        console.log('GAPI 클라이언트 초기화 완료');
+        console.log('GAPI 초기화 완료');
       });
     });
 
@@ -184,8 +191,8 @@
         accessToken = resp.access_token;
         btnDriveLogin.innerText = '✅ 드라이브 연동됨';
         btnDriveLogin.style.backgroundColor = '#28a745';
-        folderSelectContainer.style.display = 'flex';
-        loadMainFolder();
+        selectContainer.style.display = 'flex';
+        findComicRootFolder();
       },
     });
   };
@@ -194,50 +201,87 @@
     tokenClient.requestAccessToken({ prompt: 'consent' });
   };
 
-  // 1. 구글 드라이브에서 '몬스터' 최상위 폴더 찾기 및 하위 에피소드 목록 불러오기
-  async function loadMainFolder() {
+  // 0단계: 구글 드라이브 전체에서 '만화'라는 이름의 폴더 찾기
+  async function findComicRootFolder() {
     try {
-      // '몬스터'라는 이름의 폴더 검색
-      const query = "name = '몬스터' and mimeType = 'application/vnd.google-apps.folder' and trashed = false";
-      const response = await gapi.client.drive.files.list({ q: query, pageSize: 10 });
+      const query = "name = '만화' and mimeType = 'application/vnd.google-apps.folder' and trashed = false";
+      const response = await gapi.client.drive.files.list({ q: query, pageSize: 5 });
       const folders = response.result.files;
 
       if (folders.length === 0) {
-        alert("구글 드라이브 최상위에 '몬스터' 폴더가 없습니다. 폴더 이름을 확인해주세요.");
+        alert("구글 드라이브에 '만화' 폴더가 없습니다. 드라이브 최상위에 '만화' 폴더를 만들어주세요.");
         return;
       }
 
-      const mainFolderId = folders[0].id;
-      
-      // '몬스터' 폴더 안의 하위 폴더들(book_3, book_4 등) 가져오기
-      const subQuery = `'${mainFolderId}' in parents and mimeType = 'application/vnd.google-apps.folder' and trashed = false`;
-      const subResponse = await gapi.client.drive.files.list({ 
-        q: subQuery, 
+      // '만화' 폴더의 ID를 기준으로 하위 작품 목록 불러오기
+      loadParentFolders(folders[0].id);
+    } catch (err) {
+      console.error("'만화' 폴더 검색 에러:", err);
+      alert("'만화' 폴더를 찾는 중 에러가 발생했습니다.");
+    }
+  }
+
+  // 1단계: '만화' 폴더 안의 하위 폴더들(작품 목록: 몬스터 등) 불러오기
+  async function loadParentFolders(comicRootId) {
+    try {
+      const query = `'${comicRootId}' in parents and mimeType = 'application/vnd.google-apps.folder' and trashed = false`;
+      const response = await gapi.client.drive.files.list({ 
+        q: query, 
         orderBy: 'name_natural', 
         pageSize: 100 
       });
-      
-      const subFolders = subResponse.result.files;
-      subFolderSelect.innerHTML = '<option value="">-- 에피소드를 선택하세요 --</option>';
-      
+      const folders = response.result.files;
+
+      parentFolderSelect.innerHTML = '<option value="">-- 작품 폴더 선택 --</option>';
+      folders.forEach(folder => {
+        const opt = document.createElement('option');
+        opt.value = folder.id;
+        opt.innerText = folder.name;
+        parentFolderSelect.appendChild(opt);
+      });
+    } catch (err) {
+      console.error('작품 폴더 로드 에러:', err);
+      alert('작품 목록을 불러오는 중 에러가 발생했습니다.');
+    }
+  }
+
+  // 2단계: 사용자가 특정 작품 폴더를 고르면, 그 안의 하위 폴더(권 목록) 불러오기
+  parentFolderSelect.onchange = async () => {
+    const parentId = parentFolderSelect.value;
+    subFolderSelect.innerHTML = '<option value="">-- 권 선택 --</option>';
+    
+    if (!parentId) return;
+
+    try {
+      const query = `'${parentId}' in parents and mimeType = 'application/vnd.google-apps.folder' and trashed = false`;
+      const response = await gapi.client.drive.files.list({ 
+        q: query, 
+        orderBy: 'name_natural', 
+        pageSize: 100 
+      });
+      const subFolders = response.result.files;
+
+      if (subFolders.length === 0) {
+        subFolderSelect.innerHTML = '<option value="">-- 하위 권 폴더가 없습니다 --</option>';
+        return;
+      }
+
       subFolders.forEach(folder => {
         const opt = document.createElement('option');
         opt.value = folder.id;
         opt.innerText = folder.name;
         subFolderSelect.appendChild(opt);
       });
-
     } catch (err) {
-      console.error('폴더 로드 에러:', err);
-      alert('구글 드라이브 데이터를 불러오는 중 에러가 발생했습니다.');
+      console.error('권 폴더 로드 에러:', err);
     }
-  }
+  };
 
-  // 2. 선택한 에피소드 폴더 안의 이미지 파일들을 불러와 뷰어에 렌더링
+  // 3단계: 선택한 권 폴더 안의 이미지 파일들을 불러와 뷰어에 렌더링
   btnLoadImages.onclick = async () => {
     const selectedFolderId = subFolderSelect.value;
     if (!selectedFolderId) {
-      alert('불러올 에피소드 폴더를 선택해주세요.');
+      alert('불러올 권(에피소드) 폴더를 선택해주세요.');
       return;
     }
 
@@ -260,17 +304,13 @@
         return;
       }
 
-      // 구글 드라이브 이미지를 안전하게 가져오기 위해 Fetch 후 Blob URL로 변환
       for (const file of files) {
         const img = document.createElement('img');
-        
-        // 드라이브 파일 다운로드 요청
         const imgResponse = await fetch(`https://www.googleapis.com/drive/v3/files/${file.id}?alt=media`, {
           headers: { 'Authorization': `Bearer ${accessToken}` }
         });
         const blob = await imgResponse.blob();
         img.src = URL.createObjectURL(blob);
-        
         viewer.appendChild(img);
       }
 
@@ -284,7 +324,7 @@
     }
   };
 
-  // --- 기존 필터 및 스크롤 로직 유지 ---
+  // --- 기존 필터 및 스크롤 로직 ---
   var showControl = true;
   document.addEventListener('click', (e) => {
     if (e.target.closest('#controls') || e.target.closest('#scrollDownBtn') || e.target.closest('#scrollupBtn')) return; 
@@ -294,7 +334,6 @@
   });
 
   const sharpenMatrix = document.getElementById('sharpenMatrix');
-  const inputs = ['Brightness', 'Contrast', 'Sharpen'];
 
   const updateFilters = () => {
     const b = document.getElementById('valBrightness').value;
@@ -314,7 +353,7 @@
     viewer.style.filter = `${svgFilter}brightness(${b}%) contrast(${c}%)`;
   };
 
-  inputs.forEach(type => {
+  ['Brightness', 'Contrast', 'Sharpen'].forEach(type => {
     document.getElementById(`val${type}`).addEventListener('input', updateFilters);
   });
 
