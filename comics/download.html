@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>만화 자동 다운로더</title>
+<title>만화 자동 다운로더 (폴더 지정형)</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
   body {
@@ -25,7 +25,6 @@
     flex-wrap: wrap;
   }
   
-  /* 입력 창 스타일 추가 */
   .input-group {
     display: flex;
     align-items: center;
@@ -33,20 +32,22 @@
     font-size: 14px;
     font-weight: bold;
   }
-  #startNum {
-    width: 60px;
+  .input-group input {
     padding: 8px;
-    font-size: 16px;
-    text-align: center;
+    font-size: 14px;
     border: 1px solid #555;
     border-radius: 4px;
     background: #333;
     color: white;
   }
-  #startNum:disabled {
+  .input-group input:disabled {
     background: #222;
     color: #888;
   }
+  
+  #targetUrl { width: 300px; }
+  #saveName { width: 120px; }
+  #startNum { width: 60px; text-align: center; }
 
   button {
     padding: 10px 20px;
@@ -56,9 +57,16 @@
     border: none;
     border-radius: 4px;
   }
+  #btnSelectFolder { background-color: #2196f3; color: white; }
   #btnStart { background-color: #4caf50; color: white; }
   #btnStop { background-color: #f44336; color: white; display: none; }
   
+  .folder-info {
+    font-size: 14px;
+    color: #ffeb3b;
+    font-weight: bold;
+  }
+
   #logArea {
     flex-grow: 1;
     color: #00ff00;
@@ -78,33 +86,62 @@
 <body>
 
   <div id="panel">
-    <!-- ⬇️ 시작 화수 입력 UI 추가 -->
+    <!-- ⬇️ 폴더 선택 UI 추가 -->
+    <button id="btnSelectFolder">📁 저장 폴더 선택</button>
+    <span class="folder-info" id="folderNameDisplay">선택된 폴더 없음 (기본 다운로드 폴더 사용)</span>
+
     <div class="input-group">
-      <label for="startNum">저장 화수:</label>
+      <label for="targetUrl">URL:</label>
+      <input type="text" id="targetUrl" value="https://update.spotv24.com/">
+    </div>
+
+    <div class="input-group">
+      <label for="saveName">이름:</label>
+      <input type="text" id="saveName" value="book">
+    </div>
+    <div class="input-group">
+      <label for="startNum">화수:</label>
       <input type="number" id="startNum" value="1" min="1">
     </div>
     
     <button id="btnStart">▶ 자동 다운로드 시작</button>
     <button id="btnStop">■ 중지</button>
-    <div id="logArea">대기 중... (크롬 보안 해제 모드 필수)</div>
+    <div id="logArea">대기 중...</div>
   </div>
 
-  <iframe id="viewerFrame" src="https://update.spotv24.com/"></iframe>
+  <iframe id="viewerFrame" src="about:blank"></iframe>
 
 <script>
   const iframe = document.getElementById('viewerFrame');
   const btnStart = document.getElementById('btnStart');
   const btnStop = document.getElementById('btnStop');
+  const btnSelectFolder = document.getElementById('btnSelectFolder');
+  const folderNameDisplay = document.getElementById('folderNameDisplay');
   const logArea = document.getElementById('logArea');
-  const startNumInput = document.getElementById('startNum'); // 추가된 입력 요소
+  
+  const targetUrlInput = document.getElementById('targetUrl');
+  const saveNameInput = document.getElementById('saveName');
+  const startNumInput = document.getElementById('startNum');
   
   let isRunning = false;
   let episodeCount = 1;
+  let directoryHandle = null; // 사용자가 선택한 폴더 핸들 저장 변수
 
   function log(msg) {
     console.log(msg);
     logArea.innerText = msg;
   }
+
+  // ⬇️ 폴더 선택 버튼 이벤트 (File System Access API)
+  btnSelectFolder.addEventListener('click', async () => {
+    try {
+      directoryHandle = await window.showDirectoryPicker();
+      folderNameDisplay.innerText = `📁 선택됨: ${directoryHandle.name}`;
+      log(`저장 폴더가 '${directoryHandle.name}'(으)로 설정되었습니다.`);
+    } catch (e) {
+      log('폴더 선택이 취소되었습니다.');
+    }
+  });
 
   async function scrollIframe(iframeWindow, iframeDoc) {
     log('지연 로딩 해제 중 (스크롤 다운)...');
@@ -128,9 +165,8 @@
 
       const canvases = Array.from(iframeDoc.querySelectorAll('canvas'));
       if (canvases.length === 0) {
-        log('⚠️ 캔버스를 찾을 수 없습니다. (CORS 문제이거나 페이지 로딩 오류)');
-        isRunning = false;
-        toggleButtons();
+        log('⚠️ 캔버스를 찾을 수 없거나 아직 로딩 중입니다. 3초 후 재시도합니다.');
+        setTimeout(processCurrentEpisode, 3000);
         return;
       }
 
@@ -146,18 +182,31 @@
 
       log(`에피소드 ${episodeCount} 압축 중...`);
       const content = await zip.generateAsync({ type: 'blob' });
-      const zipUrl = URL.createObjectURL(content);
       
-      const a = document.createElement('a');
-      a.href = zipUrl;
-      // ⬇️ 지정한 에피소드 번호로 파일명 생성
-      a.download = `comic_episode_${episodeCount}.zip`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(zipUrl);
+      const prefix = saveNameInput.value.trim() || 'comic';
+      const finalFileName = `${prefix}_${episodeCount}.zip`;
+      
+      // ⬇️ 파일 저장 로직 분기
+      if (directoryHandle) {
+        // 지정된 폴더가 있을 경우: File System API를 통해 직접 쓰기
+        const fileHandle = await directoryHandle.getFileHandle(finalFileName, { create: true });
+        const writable = await fileHandle.createWritable();
+        await writable.write(content);
+        await writable.close();
+        log(`📁 [${directoryHandle.name}] 폴더에 저장 완료: ${finalFileName}`);
+      } else {
+        // 지정된 폴더가 없을 경우: 기존 방식(브라우저 기본 다운로드) 사용
+        const zipUrl = URL.createObjectURL(content);
+        const a = document.createElement('a');
+        a.href = zipUrl;
+        a.download = finalFileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(zipUrl);
+        log(`기본 다운로드 폴더에 저장 완료: ${finalFileName}`);
+      }
 
-      // ⬇️ 다운로드가 완료되면 카운트를 올리고 UI 입력창의 숫자도 동기화
       episodeCount++;
       startNumInput.value = episodeCount;
       
@@ -184,17 +233,31 @@
   function toggleButtons() {
     btnStart.style.display = isRunning ? 'none' : 'inline-block';
     btnStop.style.display = isRunning ? 'inline-block' : 'none';
-    // 실행 중일 때는 사용자가 숫자를 바꾸지 못하도록 막음
+    
+    targetUrlInput.disabled = isRunning;
+    saveNameInput.disabled = isRunning;
     startNumInput.disabled = isRunning;
+    btnSelectFolder.disabled = isRunning; // 실행 중 폴더 변경 방지
   }
 
   btnStart.addEventListener('click', () => {
-    // ⬇️ '시작' 버튼을 누를 때 입력창에 적힌 숫자를 현재 화수로 세팅
     episodeCount = parseInt(startNumInput.value, 10) || 1;
+    const url = targetUrlInput.value.trim();
     
+    if (!url) {
+      alert('시작 URL을 입력해주세요.');
+      return;
+    }
+
     isRunning = true;
     toggleButtons();
-    processCurrentEpisode();
+    
+    if (iframe.src !== url && iframe.src !== url + '/') {
+      log('새로운 URL을 로드합니다...');
+      iframe.src = url;
+    } else {
+      processCurrentEpisode();
+    }
   });
 
   btnStop.addEventListener('click', () => {
@@ -204,8 +267,8 @@
   });
 
   iframe.addEventListener('load', () => {
-    if (isRunning) {
-      log('새 에피소드 로드 완료. 3초 후 추출을 시작합니다...');
+    if (isRunning && iframe.src !== 'about:blank' && iframe.src !== window.location.href) {
+      log('페이지 로드 완료. 3초 후 이미지 추출을 시작합니다...');
       setTimeout(processCurrentEpisode, 3000); 
     }
   });
