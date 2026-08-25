@@ -70,6 +70,27 @@
         padding: 8px 16px;
       }
 
+      /* 🚀 다음화 넘기기 전용 스타일 */
+      #nextEpisodeContainer {
+        width: 100%;
+        padding: 40px 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      #btnNextEpisode {
+        background-color: #28a745;
+        font-size: 16px;
+        padding: 14px 28px;
+        border-radius: 30px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        transition: background 0.2s, transform 0.2s;
+      }
+      #btnNextEpisode:hover {
+        background-color: #218838;
+        transform: scale(1.05);
+      }
+
       .select-group {
         display: none;
         gap: 8px;
@@ -403,6 +424,27 @@
           }
 
           loadingStatus.style.display = "none";
+
+          // 🚀 [추가 기능] 모든 이미지 로딩 완료 후 맨 마지막에 '다음화로 넘기기' 버튼 생성
+          const nextIndex = subFolderSelect.selectedIndex + 1;
+          if (nextIndex < subFolderSelect.options.length) {
+            const nextDiv = document.createElement("div");
+            nextDiv.id = "nextEpisodeContainer";
+            
+            const nextBtn = document.createElement("button");
+            nextBtn.className = "btn";
+            nextBtn.id = "btnNextEpisode";
+            nextBtn.innerText = "📖 다음화로 넘어가기 ➡️";
+            
+            nextBtn.onclick = () => {
+              subFolderSelect.selectedIndex = nextIndex;
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+              btnLoadImages.click(); // 자동으로 불러오기 실행
+            };
+
+            nextDiv.appendChild(nextBtn);
+            viewer.appendChild(nextDiv);
+          }
 
         } catch (err) {
           console.error("이미지 전체 로드 에러:", err);
