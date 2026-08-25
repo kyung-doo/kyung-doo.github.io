@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>만화 자동 다운로더</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+  body {
+    margin: 0;
+    background-color: #1a1a1a;
+    color: #eee;
+    font-family: sans-serif;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
+  #panel {
+    padding: 15px;
+    background: #000;
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    border-bottom: 2px solid #333;
+    flex-wrap: wrap;
+  }
+  
+  /* 입력 창 스타일 추가 */
+  .input-group {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 14px;
+    font-weight: bold;
+  }
+  #startNum {
+    width: 60px;
+    padding: 8px;
+    font-size: 16px;
+    text-align: center;
+    border: 1px solid #555;
+    border-radius: 4px;
+    background: #333;
+    color: white;
+  }
+  #startNum:disabled {
+    background: #222;
+    color: #888;
+  }
+
+  button {
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    border-radius: 4px;
+  }
+  #btnStart { background-color: #4caf50; color: white; }
+  #btnStop { background-color: #f44336; color: white; display: none; }
+  
+  #logArea {
+    flex-grow: 1;
+    color: #00ff00;
+    font-family: monospace;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  #viewerFrame {
+    flex-grow: 1;
+    border: none;
+    width: 100%;
+    background-color: #fff;
+  }
+</style>
+</head>
+<body>
+
+  <div id="panel">
+    <!-- ⬇️ 시작 화수 입력 UI 추가 -->
+    <div class="input-group">
+      <label for="startNum">저장 화수:</label>
+      <input type="number" id="startNum" value="1" min="1">
+    </div>
+    
+    <button id="btnStart">▶ 자동 다운로드 시작</button>
+    <button id="btnStop">■ 중지</button>
+    <div id="logArea">대기 중... (크롬 보안 해제 모드 필수)</div>
+  </div>
+
+  <iframe id="viewerFrame" src="https://update.spotv24.com/"></iframe>
+
+<script>
+  const iframe = document.getElementById('viewerFrame');
+  const btnStart = document.getElementById('btnStart');
+  const btnStop = document.getElementById('btnStop');
+  const logArea = document.getElementById('logArea');
+  const startNumInput = document.getElementById('startNum'); // 추가된 입력 요소
+  
+  let isRunning = false;
+  let episodeCount = 1;
+
+  function log(msg) {
+    console.log(msg);
+    logArea.innerText = msg;
+  }
+
+  async function scrollIframe(iframeWindow, iframeDoc) {
+    log('지연 로딩 해제 중 (스크롤 다운)...');
+    const scrollHeight = iframeDoc.body.scrollHeight;
+    
+    for(let y = 0; y < scrollHeight; y += 800) {
+      iframeWindow.scrollTo(0, y);
+      await new Promise(r => setTimeout(r, 200)); 
+    }
+    await new Promise(r => setTimeout(r, 1500));
+  }
+
+  async function processCurrentEpisode() {
+    if (!isRunning) return;
+
+    try {
+      const iframeWindow = iframe.contentWindow;
+      const iframeDoc = iframe.contentDocument || iframeWindow.document;
+
+      await scrollIframe(iframeWindow, iframeDoc);
+
+      const canvases = Array.from(iframeDoc.querySelectorAll('canvas'));
+      if (canvases.length === 0) {
+        log('⚠️ 캔버스를 찾을 수 없습니다. (CORS 문제이거나 페이지 로딩 오류)');
+        isRunning = false;
+        toggleButtons();
+        return;
+      }
+
+      log(`총 ${canvases.length}장의 캔버스 추출 중... ZIP 압축 준비`);
+
+      const zip = new JSZip();
+      canvases.forEach((canvas, idx) => {
+        const dataUrl = canvas.toDataURL('image/png'); 
+        const base64Data = dataUrl.split(',')[1];
+        const fileName = String(idx + 1).padStart(3, '0') + '.png';
+        zip.file(fileName, base64Data, {base64: true});
+      });
+
+      log(`에피소드 ${episodeCount} 압축 중...`);
+      const content = await zip.generateAsync({ type: 'blob' });
+      const zipUrl = URL.createObjectURL(content);
+      
+      const a = document.createElement('a');
+      a.href = zipUrl;
+      // ⬇️ 지정한 에피소드 번호로 파일명 생성
+      a.download = `comic_episode_${episodeCount}.zip`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(zipUrl);
+
+      // ⬇️ 다운로드가 완료되면 카운트를 올리고 UI 입력창의 숫자도 동기화
+      episodeCount++;
+      startNumInput.value = episodeCount;
+      
+      log('✅ 다운로드 완료! 다음 화 확인 중...');
+
+      const nextBtn = iframeDoc.querySelector('.right-episode.next');
+      
+      if (nextBtn && nextBtn.dataset.locked !== "true" && !nextBtn.disabled) {
+        log('➡️ 다음 화로 이동합니다.');
+        nextBtn.click(); 
+      } else {
+        log('🎉 다음 화가 없습니다. 모든 다운로드가 완료되었습니다!');
+        isRunning = false;
+        toggleButtons();
+      }
+
+    } catch (e) {
+      log('❌ 에러 발생: ' + e.message);
+      isRunning = false;
+      toggleButtons();
+    }
+  }
+
+  function toggleButtons() {
+    btnStart.style.display = isRunning ? 'none' : 'inline-block';
+    btnStop.style.display = isRunning ? 'inline-block' : 'none';
+    // 실행 중일 때는 사용자가 숫자를 바꾸지 못하도록 막음
+    startNumInput.disabled = isRunning;
+  }
+
+  btnStart.addEventListener('click', () => {
+    // ⬇️ '시작' 버튼을 누를 때 입력창에 적힌 숫자를 현재 화수로 세팅
+    episodeCount = parseInt(startNumInput.value, 10) || 1;
+    
+    isRunning = true;
+    toggleButtons();
+    processCurrentEpisode();
+  });
+
+  btnStop.addEventListener('click', () => {
+    isRunning = false;
+    toggleButtons();
+    log('🛑 사용자에 의해 중지되었습니다.');
+  });
+
+  iframe.addEventListener('load', () => {
+    if (isRunning) {
+      log('새 에피소드 로드 완료. 3초 후 추출을 시작합니다...');
+      setTimeout(processCurrentEpisode, 3000); 
+    }
+  });
+</script>
+
+</body>
+</html>

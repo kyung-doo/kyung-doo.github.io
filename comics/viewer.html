@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>만화 뷰어 (고급 필터 & 자동 스크롤)</title>
+<style>
+  body {
+    background-color: #1a1a1a;
+    color: #eee;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: sans-serif;
+    overflow-x: hidden;
+  }
+  #controls {
+    position: sticky;
+    top: 0;
+    background: rgba(0, 0, 0, 0.9);
+    width: 100%;
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    z-index: 100;
+  }
+  .btn {
+    padding: 10px 20px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
+  .btn:hover { background: #0056b3; }
+  
+  .slider-group {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    font-size: 14px;
+    margin-top: 20px;
+  }
+  .slider-group label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  #viewer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 1200px;
+    transition: filter 0.1s ease-out;
+  }
+  
+  #viewer img {
+    max-width: 100%;
+    height: auto;
+    image-rendering: -webkit-optimize-contrast;
+    margin-bottom: -1px;
+  }
+
+  /* ⬇️ 자동 스크롤 버튼 스타일 */
+  #scrollDownBtn,
+  #scrollupBtn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: rgba(255, 152, 0, 0.8);
+    color: white;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    z-index: 999;
+    user-select: none; /* 텍스트 선택 방지 */
+    display: none; /* 이미지가 로드되기 전에는 숨김 */
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.2s;
+  }
+  #scrollDownBtn:active,
+  #scrollupBtn:active {
+    background-color: rgba(230, 138, 0, 1);
+  }
+  #scrollupBtn {
+    bottom: 100px;
+  }
+  
+</style>
+</head>
+<body>
+
+  <svg style="display: none;">
+    <defs>
+      <filter id="sharpenFilter">
+        <feConvolveMatrix id="sharpenMatrix" order="3" preserveAlpha="true" kernelMatrix="0 0 0 0 1 0 0 0 0" />
+      </filter>
+    </defs>
+  </svg>
+
+  <div id="controls">
+    <label class="btn" for="folderInput">📂 만화 폴더 열기</label>
+    <input type="file" id="folderInput" webkitdirectory multiple style="display: none;">
+    
+    <div class="slider-group">
+      <label>명도: <input type="range" id="valBrightness" min="50" max="150" value="100"> <span id="txtBrightness">100%</span></label>
+      <label>대비: <input type="range" id="valContrast" min="50" max="200" value="100"> <span id="txtContrast">100%</span></label>
+      <label style="color: #ff9800; font-weight: bold;">샤픈: <input type="range" id="valSharpen" min="0" max="100" value="0"> <span id="txtSharpen">0%</span></label>
+      <button onclick="resetFilters()" style="padding: 2px 8px; cursor: pointer;">초기화</button>
+    </div>
+  </div>
+
+  <div id="viewer"></div>
+
+  <!-- ⬇️ 스크롤 버튼 요소 -->
+  <button id="scrollupBtn" title="누르고 있으면 스크롤">▲</button>
+  <button id="scrollDownBtn" title="누르고 있으면 스크롤">▼</button>
+
+<script> 
+    var showControl = true;
+    
+    document.getElementById('folderInput').addEventListener('change', function(event) {
+        const files = Array.from(event.target.files);
+        const viewer = document.getElementById('viewer');
+        const scrolldownBtn = document.getElementById('scrollDownBtn');
+        const scrollupBtn = document.getElementById('scrollupBtn');
+        viewer.innerHTML = ''; 
+
+        const imageFiles = files
+            .filter(file => file.type.startsWith('image/'))
+            .sort((a, b) => a.name.localeCompare(b.name, undefined, {numeric: true}));
+
+        if (imageFiles.length === 0) {
+            alert('폴더에 이미지 파일이 없습니다.');
+            return;
+        }
+
+        imageFiles.forEach(file => {
+            const img = document.createElement('img');
+            img.src = URL.createObjectURL(file);
+            viewer.appendChild(img);
+            img.onload = () => URL.revokeObjectURL(img.src);
+        });
+
+        // 이미지가 로드되면 스크롤 버튼 표시
+        scrolldownBtn.style.display = 'flex';
+        scrollupBtn.style.display = 'flex';
+    });
+
+    document.addEventListener('click', (e) => {
+        // 컨트롤 패널이나 스크롤 버튼을 누를 때는 상단 패널이 숨겨지지 않도록 예외 처리
+        if (e.target.closest('#controls') || e.target.closest('#scrollDownBtn') || e.target.closest('#scrollupBtn')) return; 
+        
+        if(showControl) document.querySelector('#controls').style.display = 'none';
+        else            document.querySelector('#controls').style.display = 'block';
+        showControl = !showControl;
+    });
+
+    // --- 필터 로직 ---
+    const viewer = document.getElementById('viewer');
+    const sharpenMatrix = document.getElementById('sharpenMatrix');
+    const inputs = ['Brightness', 'Contrast', 'Sharpen'];
+
+    const updateFilters = () => {
+        const b = document.getElementById('valBrightness').value;
+        const c = document.getElementById('valContrast').value;
+        const sh = parseInt(document.getElementById('valSharpen').value, 10);
+        
+        document.getElementById('txtBrightness').innerText = b + '%';
+        document.getElementById('txtContrast').innerText = c + '%';
+        document.getElementById('txtSharpen').innerText = sh + '%';
+
+        const amount = sh / 50; 
+        const center = (4 * amount) + 1;
+        const edge = -amount;
+        
+        const matrixString = `0 ${edge} 0 ${edge} ${center} ${edge} 0 ${edge} 0`;
+        sharpenMatrix.setAttribute('kernelMatrix', matrixString);
+
+        const svgFilter = sh > 0 ? `url(#sharpenFilter) ` : '';
+        viewer.style.filter = `${svgFilter}brightness(${b}%) contrast(${c}%)`;
+    };
+
+    inputs.forEach(type => {
+        document.getElementById(`val${type}`).addEventListener('input', updateFilters);
+    });
+
+    window.resetFilters = () => {
+        document.getElementById('valBrightness').value = 100;
+        document.getElementById('valContrast').value = 100;
+        document.getElementById('valSharpen').value = 0;
+        updateFilters();
+    };
+
+    // --- ⬇️ 자동 스크롤 로직 ---
+    const scrollDownBtn = document.getElementById('scrollDownBtn');
+    const scrollUpBtn = document.getElementById('scrollupBtn');
+    let scrollReq;
+    let arrow = '';
+
+    // 1px씩 끊임없이 내리는 재귀 함수
+    const autoScroll = ( up = false ) => {
+        if(arrow === 'up'){
+            window.scrollBy(0, -2);
+        } else {
+            window.scrollBy(0, 2);
+        }
+        scrollReq = requestAnimationFrame(autoScroll);
+    };
+
+    const stopScroll = () => {
+        if (scrollReq) {
+            cancelAnimationFrame(scrollReq);
+            scrollReq = null;
+        }
+    };
+
+    // 마우스 이벤트
+    scrollDownBtn.addEventListener('mousedown', () => {
+        arrow = 'down';
+        if (!scrollReq) autoScroll();
+    });
+    scrollDownBtn.addEventListener('mouseup', stopScroll);
+    scrollDownBtn.addEventListener('mouseleave', stopScroll);
+
+    // 모바일 터치 이벤트
+    scrollDownBtn.addEventListener('touchstart', (e) => {
+        arrow = 'down';
+        e.preventDefault(); // 더블탭 줌 등 모바일 브라우저 기본 동작 방지
+        if (!scrollReq) autoScroll();
+    });
+    scrollDownBtn.addEventListener('touchend', stopScroll);
+    scrollDownBtn.addEventListener('touchcancel', stopScroll);
+
+
+    scrollupBtn.addEventListener('mousedown', () => {
+        arrow = 'up';
+        if (!scrollReq) autoScroll();
+    });
+    scrollupBtn.addEventListener('mouseup', stopScroll);
+    scrollupBtn.addEventListener('mouseleave', stopScroll);
+
+    // 모바일 터치 이벤트
+    scrollupBtn.addEventListener('touchstart', (e) => {
+        arrow = 'up';
+        e.preventDefault(); // 더블탭 줌 등 모바일 브라우저 기본 동작 방지
+        if (!scrollReq) autoScroll();
+    });
+    scrollupBtn.addEventListener('touchend', stopScroll);
+    scrollupBtn.addEventListener('touchcancel', stopScroll);
+</script>
+
+</body>
+</html>
