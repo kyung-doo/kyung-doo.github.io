@@ -236,7 +236,6 @@
         document.getElementById("scrollupBtn").style.display = "none";
       }
 
-      // 🚀 페이지 로드시 저장된 필터 값 복원
       window.addEventListener('DOMContentLoaded', () => {
         const savedB = localStorage.getItem('filter_brightness');
         const savedC = localStorage.getItem('filter_contrast');
@@ -245,8 +244,7 @@
         if (savedB !== null) document.getElementById("valBrightness").value = savedB;
         if (savedC !== null) document.getElementById("valContrast").value = savedC;
         if (savedSh !== null) document.getElementById("valSharpen").value = savedSh;
-        
-        updateFilters(); // 초기값 반영
+        updateFilters();
       });
 
       window.onload = () => {
@@ -305,58 +303,63 @@
             opt.innerText = folder.name;
             parentFolderSelect.appendChild(opt);
           });
-
-          const savedParent = localStorage.getItem('last_parent_folder');
-          if (savedParent) {
-            parentFolderSelect.value = savedParent;
-            await loadSubFolders(savedParent, true);
-          }
         } catch (err) {
           console.error("작품 폴더 로드 에러:", err);
         }
       }
 
-      async function loadSubFolders(parentId, autoSelect = false) {
+      // 🚀 작품(부모 폴더)을 바꿀 때, 해당 책에 저장된 권이 있으면 컨펌창 띄우기
+      parentFolderSelect.onchange = async () => {
+        const parentId = parentFolderSelect.value;
         subFolderSelect.innerHTML = '<option value="">-- 권 선택 --</option>';
         if (!parentId) return;
 
         try {
           const query = `'${parentId}' in parents and mimeType = 'application/vnd.google-apps.folder' and trashed = false`;
           const response = await gapi.client.drive.files.list({ q: query, orderBy: "name_natural", pageSize: 100 });
-          response.result.files.forEach((folder) => {
+          const subFolders = response.result.files;
+
+          subFolders.forEach((folder) => {
             const opt = document.createElement("option");
             opt.value = folder.id;
             opt.innerText = folder.name;
             subFolderSelect.appendChild(opt);
           });
 
-          if (autoSelect) {
-            const savedSub = localStorage.getItem('last_sub_folder');
-            if (savedSub) {
-              subFolderSelect.value = savedSub;
-              if (subFolderSelect.value) {
-                btnLoadImages.click();
+          // 해당 책(parentId)에 대해 저장된 마지막 권 ID 확인
+          const savedSubId = localStorage.getItem(`book_sub_${parentId}`);
+          if (savedSubId) {
+            // 해당 옵션의 이름(몇 권인지) 찾기
+            let targetOptionName = "";
+            for (let opt of subFolderSelect.options) {
+              if (opt.value === savedSubId) {
+                targetOptionName = opt.innerText;
+                break;
+              }
+            }
+
+            if (targetOptionName) {
+              if (confirm(`[${targetOptionName}]까지 읽었습니다. 이어보시겠습니까?`)) {
+                subFolderSelect.value = savedSubId;
+                btnLoadImages.click(); // 곧바로 불러오기 실행
               }
             }
           }
         } catch (err) {
           console.error("권 폴더 로드 에러:", err);
         }
-      }
-
-      parentFolderSelect.onchange = async () => {
-        loadSubFolders(parentFolderSelect.value);
       };
 
       btnLoadImages.onclick = async () => {
+        const parentId = parentFolderSelect.value;
         const selectedFolderId = subFolderSelect.value;
         if (!selectedFolderId) {
           alert("불러올 권 폴더를 선택해주세요.");
           return;
         }
 
-        localStorage.setItem('last_parent_folder', parentFolderSelect.value);
-        localStorage.setItem('last_sub_folder', selectedFolderId);
+        // 🚀 작품별로 현재 선택된 권 저장
+        localStorage.setItem(`book_sub_${parentId}`, selectedFolderId);
 
         viewer.innerHTML = ""; 
         loadingStatus.style.display = "inline-block";
@@ -409,6 +412,7 @@
 
           loadingStatus.style.display = "none";
 
+          // 다음화 넘기기 버튼 생성
           const nextIndex = subFolderSelect.selectedIndex + 1;
           if (nextIndex < subFolderSelect.options.length) {
             const nextDiv = document.createElement("div");
@@ -421,7 +425,8 @@
             
             nextBtn.onclick = () => {
               subFolderSelect.selectedIndex = nextIndex;
-              localStorage.setItem('last_sub_folder', subFolderSelect.value);
+              // 다음화로 넘아갈 때도 해당 책의 기록을 새 권으로 업데이트
+              localStorage.setItem(`book_sub_${parentId}`, subFolderSelect.value);
               window.scrollTo({ top: 0, behavior: 'smooth' });
               btnLoadImages.click(); 
             };
@@ -462,7 +467,6 @@
         document.getElementById("txtContrast").innerText = c + "%";
         document.getElementById("txtSharpen").innerText = sh + "%";
 
-        // 🚀 슬라이더 조절할 때마다 localStorage에 값 저장
         localStorage.setItem('filter_brightness', b);
         localStorage.setItem('filter_contrast', c);
         localStorage.setItem('filter_sharpen', sh);
