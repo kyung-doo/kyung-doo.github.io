@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>만화 자동 다운로더 (폴더 지정형)</title>
+<title>만화 자동 다운로더 (UX 개선형)</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
   body {
@@ -45,21 +45,23 @@
     color: #888;
   }
   
-  #targetUrl { width: 300px; }
-  #saveName { width: 120px; }
+  #targetUrl { width: 250px; }
+  #saveName { width: 100px; }
   #startNum { width: 60px; text-align: center; }
 
   button {
-    padding: 10px 20px;
+    padding: 8px 15px;
     font-size: 14px;
     font-weight: bold;
     cursor: pointer;
     border: none;
     border-radius: 4px;
+    color: white;
   }
-  #btnSelectFolder { background-color: #2196f3; color: white; }
-  #btnStart { background-color: #4caf50; color: white; }
-  #btnStop { background-color: #f44336; color: white; display: none; }
+  #btnLoadPage { background-color: #ff9800; } /* 페이지 연결 버튼 색상 */
+  #btnSelectFolder { background-color: #2196f3; }
+  #btnStart { background-color: #4caf50; padding: 10px 20px; }
+  #btnStop { background-color: #f44336; padding: 10px 20px; display: none; }
   
   .folder-info {
     font-size: 14px;
@@ -86,37 +88,41 @@
 <body>
 
   <div id="panel">
-    <!-- ⬇️ 폴더 선택 UI 추가 -->
-    <button id="btnSelectFolder">📁 저장 폴더 선택</button>
-    <span class="folder-info" id="folderNameDisplay">선택된 폴더 없음 (기본 다운로드 폴더 사용)</span>
-
+    <!-- ⬇️ 기능 1: URL 연결부 독립 -->
     <div class="input-group">
       <label for="targetUrl">URL:</label>
       <input type="text" id="targetUrl" value="https://update.spotv24.com/">
+      <button id="btnLoadPage">🌐 연결</button>
     </div>
 
+    <!-- ⬇️ 기능 2: 폴더 설정 -->
+    <button id="btnSelectFolder">📁 폴더 지정</button>
+    
+    <!-- ⬇️ 기능 3: 다운로드 설정 -->
     <div class="input-group">
       <label for="saveName">이름:</label>
-      <input type="text" id="saveName" value="book">
+      <input type="text" id="saveName" value="몬스터">
     </div>
     <div class="input-group">
       <label for="startNum">화수:</label>
       <input type="number" id="startNum" value="1" min="1">
     </div>
     
-    <button id="btnStart">▶ 자동 다운로드 시작</button>
+    <!-- ⬇️ 기능 4: 실행 컨트롤러 -->
+    <button id="btnStart">▶ 봇 시작</button>
     <button id="btnStop">■ 중지</button>
-    <div id="logArea">대기 중...</div>
+    
+    <div id="logArea">대기 중... (먼저 '연결' 버튼을 눌러주세요)</div>
   </div>
 
   <iframe id="viewerFrame" src="about:blank"></iframe>
 
 <script>
   const iframe = document.getElementById('viewerFrame');
+  const btnLoadPage = document.getElementById('btnLoadPage');
   const btnStart = document.getElementById('btnStart');
   const btnStop = document.getElementById('btnStop');
   const btnSelectFolder = document.getElementById('btnSelectFolder');
-  const folderNameDisplay = document.getElementById('folderNameDisplay');
   const logArea = document.getElementById('logArea');
   
   const targetUrlInput = document.getElementById('targetUrl');
@@ -125,18 +131,29 @@
   
   let isRunning = false;
   let episodeCount = 1;
-  let directoryHandle = null; // 사용자가 선택한 폴더 핸들 저장 변수
+  let directoryHandle = null; 
 
   function log(msg) {
     console.log(msg);
     logArea.innerText = msg;
   }
 
-  // ⬇️ 폴더 선택 버튼 이벤트 (File System Access API)
+  // 1. 수동 연결 버튼 이벤트
+  btnLoadPage.addEventListener('click', () => {
+    const url = targetUrlInput.value.trim();
+    if (!url) {
+      alert('연결할 URL을 입력해주세요.');
+      return;
+    }
+    log('로딩 중... 화면이 보일 때까지 대기해주세요.');
+    iframe.src = url;
+  });
+
+  // 2. 폴더 선택 버튼 이벤트
   btnSelectFolder.addEventListener('click', async () => {
     try {
       directoryHandle = await window.showDirectoryPicker();
-      folderNameDisplay.innerText = `📁 선택됨: ${directoryHandle.name}`;
+      btnSelectFolder.innerText = `📁 ${directoryHandle.name}`;
       log(`저장 폴더가 '${directoryHandle.name}'(으)로 설정되었습니다.`);
     } catch (e) {
       log('폴더 선택이 취소되었습니다.');
@@ -165,12 +182,12 @@
 
       const canvases = Array.from(iframeDoc.querySelectorAll('canvas'));
       if (canvases.length === 0) {
-        log('⚠️ 캔버스를 찾을 수 없거나 아직 로딩 중입니다. 3초 후 재시도합니다.');
+        log('⚠️ 캔버스를 찾을 수 없거나 로딩 오류입니다. 3초 후 재시도합니다.');
         setTimeout(processCurrentEpisode, 3000);
         return;
       }
 
-      log(`총 ${canvases.length}장의 캔버스 추출 중... ZIP 압축 준비`);
+      log(`총 ${canvases.length}장의 이미지(캔버스) ZIP 압축 중...`);
 
       const zip = new JSZip();
       canvases.forEach((canvas, idx) => {
@@ -180,22 +197,17 @@
         zip.file(fileName, base64Data, {base64: true});
       });
 
-      log(`에피소드 ${episodeCount} 압축 중...`);
       const content = await zip.generateAsync({ type: 'blob' });
-      
       const prefix = saveNameInput.value.trim() || 'comic';
       const finalFileName = `${prefix}_${episodeCount}.zip`;
       
-      // ⬇️ 파일 저장 로직 분기
       if (directoryHandle) {
-        // 지정된 폴더가 있을 경우: File System API를 통해 직접 쓰기
         const fileHandle = await directoryHandle.getFileHandle(finalFileName, { create: true });
         const writable = await fileHandle.createWritable();
         await writable.write(content);
         await writable.close();
-        log(`📁 [${directoryHandle.name}] 폴더에 저장 완료: ${finalFileName}`);
+        log(`📁 저장 완료: ${finalFileName}`);
       } else {
-        // 지정된 폴더가 없을 경우: 기존 방식(브라우저 기본 다운로드) 사용
         const zipUrl = URL.createObjectURL(content);
         const a = document.createElement('a');
         a.href = zipUrl;
@@ -204,13 +216,13 @@
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(zipUrl);
-        log(`기본 다운로드 폴더에 저장 완료: ${finalFileName}`);
+        log(`저장 완료: ${finalFileName}`);
       }
 
       episodeCount++;
       startNumInput.value = episodeCount;
       
-      log('✅ 다운로드 완료! 다음 화 확인 중...');
+      log('✅ 다음 화 버튼 탐색 중...');
 
       const nextBtn = iframeDoc.querySelector('.right-episode.next');
       
@@ -235,41 +247,45 @@
     btnStop.style.display = isRunning ? 'inline-block' : 'none';
     
     targetUrlInput.disabled = isRunning;
+    btnLoadPage.disabled = isRunning;
     saveNameInput.disabled = isRunning;
     startNumInput.disabled = isRunning;
-    btnSelectFolder.disabled = isRunning; // 실행 중 폴더 변경 방지
+    btnSelectFolder.disabled = isRunning;
   }
 
+  // 3. 자동 다운로드 봇 시작
   btnStart.addEventListener('click', () => {
-    episodeCount = parseInt(startNumInput.value, 10) || 1;
-    const url = targetUrlInput.value.trim();
-    
-    if (!url) {
-      alert('시작 URL을 입력해주세요.');
+    // iframe이 비어있는 상태에서 봇을 시작하려 할 경우 차단
+    if (iframe.src === 'about:blank' || iframe.src === window.location.href) {
+      alert("먼저 '🌐 연결' 버튼을 눌러 만화 페이지를 띄워주세요!");
       return;
     }
 
+    episodeCount = parseInt(startNumInput.value, 10) || 1;
     isRunning = true;
     toggleButtons();
     
-    if (iframe.src !== url && iframe.src !== url + '/') {
-      log('새로운 URL을 로드합니다...');
-      iframe.src = url;
-    } else {
-      processCurrentEpisode();
-    }
+    log('▶ 봇 구동 시작! 이미지 추출을 시도합니다.');
+    processCurrentEpisode();
   });
 
   btnStop.addEventListener('click', () => {
     isRunning = false;
     toggleButtons();
-    log('🛑 사용자에 의해 중지되었습니다.');
+    log('🛑 사용자에 의해 봇이 중지되었습니다.');
   });
 
+  // 4. 페이지 이동 완료 이벤트
   iframe.addEventListener('load', () => {
-    if (isRunning && iframe.src !== 'about:blank' && iframe.src !== window.location.href) {
-      log('페이지 로드 완료. 3초 후 이미지 추출을 시작합니다...');
-      setTimeout(processCurrentEpisode, 3000); 
+    if (iframe.src !== 'about:blank' && iframe.src !== window.location.href) {
+      if (isRunning) {
+        // 봇이 구동 중일 때(다음 화로 넘어갔을 때)
+        log('새 에피소드 로드 완료. 3초 후 이미지 추출을 시작합니다...');
+        setTimeout(processCurrentEpisode, 3000); 
+      } else {
+        // 수동으로 '연결' 버튼을 눌러서 로드되었을 때
+        log('🌐 페이지 연결 완료! 이제 다운로드를 시작할 수 있습니다.');
+      }
     }
   });
 </script>
