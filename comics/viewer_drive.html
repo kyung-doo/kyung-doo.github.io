@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>만화 뷰어 (구글 드라이브 연동형 - 컨트롤 크기 고정)</title>
+    <title>만화 뷰어 (구글 드라이브 연동형)</title>
     <style>
       body {
         background-color: #1a1a1a;
@@ -15,19 +15,25 @@
         font-family: sans-serif;
         overflow-x: hidden;
       }
-      
-      /* 🚀 브라우저 확대 시에도 크기가 커지지 않도록 fixed 및 px 단위 고정 */
-      #controls {
-        
+
+      /* 브라우저 자체 확대(줌) 시에도 컨트롤 크기가 커지지 않도록 고정하는 컨테이너 */
+      #control-wrapper {
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
+        z-index: 100;
+        display: flex;
+        justify-content: center;
         background: rgba(0, 0, 0, 0.95);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+      }
+
+      #controls {
+        width: 100%;
+        max-width: 1200px;
         padding: 10px 15px;
         text-align: center;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-        z-index: 100;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -35,14 +41,13 @@
         box-sizing: border-box;
       }
 
-      /* 컨트롤 영역이 화면 맨 위에 고정되어 있으므로, 뷰어가 그 밑부터 시작하도록 여백 확보 */
       #viewer {
         display: flex;
         flex-direction: column;
         align-items: center;
         width: 100%;
         max-width: 1200px;
-        margin-top: 110px; 
+        margin-top: 105px; /* 상단 컨트롤 바 높이만큼 여백 확보 */
         transition: filter 0.1s ease-out;
       }
 
@@ -145,53 +150,59 @@
       </defs>
     </svg>
 
-    <div id="controls">
-      <div>
-        <button class="btn" id="btnDriveLogin">🔑 구글 드라이브 로그인</button>
+    <!-- 컨트롤 크기 고정을 위한 래퍼 구조 -->
+    <div id="control-wrapper">
+      <div id="controls">
+        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: center;">
+          <button class="btn" id="btnDriveLogin">🔑 구글 드라이브 로그인</button>
 
-        <div class="select-group" id="selectContainer">
-          <label style="font-size: 12px; font-weight: bold">작품:</label>
-          <select id="parentFolderSelect">
-            <option value="">-- 작품 폴더 선택 --</option>
-          </select>
+          <!-- 로딩 상태 표시 영역 -->
+          <span id="loadingStatus" style="color: #ff9800; font-weight: bold; font-size: 13px; display: none;"></span>
 
-          <label style="font-size: 12px; font-weight: bold">권:</label>
-          <select id="subFolderSelect">
-            <option value="">-- 작품을 먼저 선택하세요 --</option>
-          </select>
+          <div class="select-group" id="selectContainer" style="margin-top: 0;">
+            <label style="font-size: 12px; font-weight: bold">작품:</label>
+            <select id="parentFolderSelect">
+              <option value="">-- 작품 폴더 선택 --</option>
+            </select>
 
-          <button class="btn" id="btnLoadImages">불러오기</button>
+            <label style="font-size: 12px; font-weight: bold">권:</label>
+            <select id="subFolderSelect">
+              <option value="">-- 작품을 먼저 선택하세요 --</option>
+            </select>
+
+            <button class="btn" id="btnLoadImages">불러오기</button>
+          </div>
         </div>
-      </div>
 
-      <div class="slider-group">
-        <label
-          >명도:
-          <input
-            type="range"
-            id="valBrightness"
-            min="50"
-            max="150"
-            value="100"
-          />
-          <span id="txtBrightness">100%</span></label
-        >
-        <label
-          >대비:
-          <input type="range" id="valContrast" min="50" max="200" value="100" />
-          <span id="txtContrast">100%</span></label
-        >
-        <label style="color: #ff9800; font-weight: bold"
-          >샤픈:
-          <input type="range" id="valSharpen" min="0" max="100" value="0" />
-          <span id="txtSharpen">0%</span></label
-        >
-        <button
-          onclick="resetFilters()"
-          style="padding: 2px 6px; cursor: pointer; font-size: 12px;"
-        >
-          초기화
-        </button>
+        <div class="slider-group">
+          <label
+            >명도:
+            <input
+              type="range"
+              id="valBrightness"
+              min="50"
+              max="150"
+              value="100"
+            />
+            <span id="txtBrightness">100%</span></label
+          >
+          <label
+            >대비:
+            <input type="range" id="valContrast" min="50" max="200" value="100" />
+            <span id="txtContrast">100%</span></label
+          >
+          <label style="color: #ff9800; font-weight: bold"
+            >샤픈:
+            <input type="range" id="valSharpen" min="0" max="100" value="0" />
+            <span id="txtSharpen">0%</span></label
+          >
+          <button
+            onclick="resetFilters()"
+            style="padding: 2px 6px; cursor: pointer; font-size: 12px;"
+          >
+            초기화
+          </button>
+        </div>
       </div>
     </div>
 
@@ -218,6 +229,23 @@
       const subFolderSelect = document.getElementById("subFolderSelect");
       const btnLoadImages = document.getElementById("btnLoadImages");
       const viewer = document.getElementById("viewer");
+      const loadingStatus = document.getElementById("loadingStatus");
+
+      // 🚀 모바일 기기 감지 및 스크롤 버튼 숨김 처리
+      var isMobile = {
+        Android: function () { return /Android/i.test(navigator.userAgent); },
+        BlackBerry: function () { return /BlackBerry/i.test(navigator.userAgent); },
+        iOS: function () { return /iPhone|iPad|iPod/i.test(navigator.userAgent); },
+        Windows: function () { return /IEMobile/i.test(navigator.userAgent); },
+        any: function () {
+          return (isMobile.Android() || isMobile.BlackBerry() || isMobile.iOS() || isMobile.Windows());
+        }
+      };
+
+      if (isMobile.any()) {
+        document.getElementById("scrollDownBtn").style.display = "none";
+        document.getElementById("scrollupBtn").style.display = "none";
+      }
 
       window.onload = () => {
         gapi.load("client", () => {
@@ -325,7 +353,9 @@
           return;
         }
 
-        viewer.innerHTML = '<p id="loadingStatus" style="padding: 20px; color: #ff9800; font-weight: bold; font-size: 16px;">이미지 목록 확인 중...</p>';
+        viewer.innerHTML = ""; 
+        loadingStatus.style.display = "inline-block";
+        loadingStatus.innerText = "🔍 이미지 목록 확인 중...";
 
         try {
           const query = `'${selectedFolderId}' in parents and mimeType contains 'image/' and trashed = false`;
@@ -340,6 +370,7 @@
           const totalFiles = files.length;
 
           if (totalFiles === 0) {
+            loadingStatus.style.display = "none";
             viewer.innerHTML = "<p style='padding: 20px;'>선택한 폴더에 이미지 파일이 없습니다.</p>";
             return;
           }
@@ -350,10 +381,7 @@
             const file = files[i];
             const currentPercent = Math.round(((i + 1) / totalFiles) * 100);
             
-            const statusEl = document.getElementById("loadingStatus");
-            if (statusEl) {
-              statusEl.innerText = `📖 로딩 중... (${i + 1} / ${totalFiles} 장 - ${currentPercent}%)`;
-            }
+            loadingStatus.innerText = `📖 로딩 중 (${i + 1}/${totalFiles} - ${currentPercent}%)`;
 
             try {
               const imgResponse = await fetch(
@@ -367,11 +395,6 @@
                 const blob = await imgResponse.blob();
                 const img = document.createElement("img");
                 img.src = URL.createObjectURL(blob);
-                
-                if (i === 0 && statusEl) {
-                  statusEl.remove();
-                }
-                
                 viewer.appendChild(img); 
               }
             } catch (e) {
@@ -379,11 +402,11 @@
             }
           }
 
-          const finalStatus = document.getElementById("loadingStatus");
-          if (finalStatus) finalStatus.remove();
+          loadingStatus.style.display = "none";
 
         } catch (err) {
           console.error("이미지 전체 로드 에러:", err);
+          loadingStatus.style.display = "none";
           alert("이미지를 불러오는 중 문제가 발생했습니다.");
         }
       };
@@ -391,14 +414,14 @@
       var showControl = true;
       document.addEventListener("click", (e) => {
         if (
-          e.target.closest("#controls") ||
+          e.target.closest("#control-wrapper") ||
           e.target.closest("#scrollDownBtn") ||
           e.target.closest("#scrollupBtn")
         )
           return;
         if (showControl)
-          document.querySelector("#controls").style.display = "none";
-        else document.querySelector("#controls").style.display = "block";
+          document.querySelector("#control-wrapper").style.display = "none";
+        else document.querySelector("#control-wrapper").style.display = "flex";
         showControl = !showControl;
       });
 
@@ -443,7 +466,7 @@
       let scrollReq;
       let arrow = "";
 
-      TheAutoScroll = () => {
+      const TheAutoScroll = () => {
         if (arrow === "up") window.scrollBy(0, -2);
         else window.scrollBy(0, 2);
         scrollReq = requestAnimationFrame(TheAutoScroll);
