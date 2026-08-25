@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>만화 뷰어 (구글 드라이브 연동형 - 순차 로딩)</title>
+    <title>만화 뷰어 (구글 드라이브 연동형 - 컨트롤 크기 고정)</title>
     <style>
       body {
         background-color: #1a1a1a;
@@ -15,28 +15,44 @@
         font-family: sans-serif;
         overflow-x: hidden;
       }
+      
+      /* 🚀 브라우저 확대 시에도 크기가 커지지 않도록 fixed 및 px 단위 고정 */
       #controls {
-        position: sticky;
+        position: fixed;
         top: 0;
-        background: rgba(0, 0, 0, 0.95);
+        left: 0;
         width: 100%;
-        padding: 15px;
+        background: rgba(0, 0, 0, 0.95);
+        padding: 10px 15px;
         text-align: center;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
         z-index: 100;
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 10px;
+        gap: 8px;
+        box-sizing: border-box;
       }
+
+      /* 컨트롤 영역이 화면 맨 위에 고정되어 있으므로, 뷰어가 그 밑부터 시작하도록 여백 확보 */
+      #viewer {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        max-width: 1200px;
+        margin-top: 110px; 
+        transition: filter 0.1s ease-out;
+      }
+
       .btn {
-        padding: 8px 15px;
+        padding: 6px 12px;
         background: #007bff;
         color: white;
         border: none;
-        border-radius: 5px;
+        border-radius: 4px;
         cursor: pointer;
-        font-size: 14px;
+        font-size: 13px;
         font-weight: bold;
       }
       .btn:hover {
@@ -44,49 +60,45 @@
       }
       #btnDriveLogin {
         background-color: #4285f4;
-        font-size: 16px;
-        padding: 10px 20px;
+        font-size: 14px;
+        padding: 8px 16px;
       }
 
       .select-group {
         display: none;
-        gap: 10px;
+        gap: 8px;
         align-items: center;
         flex-wrap: wrap;
         justify-content: center;
-        margin-top: 5px;
+        margin-top: 3px;
       }
       select {
-        padding: 8px;
-        font-size: 14px;
+        padding: 6px;
+        font-size: 13px;
         background: #333;
         color: white;
         border: 1px solid #555;
         border-radius: 4px;
-        max-width: 250px;
+        max-width: 220px;
       }
 
       .slider-group {
         display: flex;
         justify-content: center;
-        gap: 20px;
+        gap: 15px;
         flex-wrap: wrap;
-        font-size: 14px;
+        font-size: 13px;
       }
       .slider-group label {
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 6px;
+      }
+      
+      input[type="range"] {
+        width: 90px;
       }
 
-      #viewer {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        width: 100%;
-        max-width: 1200px;
-        transition: filter 0.1s ease-out;
-      }
       #viewer img {
         max-width: 100%;
         height: auto;
@@ -99,13 +111,13 @@
         position: fixed;
         bottom: 30px;
         right: 30px;
-        width: 60px;
-        height: 60px;
+        width: 50px;
+        height: 50px;
         border-radius: 50%;
         background-color: rgba(255, 152, 0, 0.8);
         color: white;
         border: none;
-        font-size: 24px;
+        font-size: 20px;
         cursor: pointer;
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
         z-index: 999;
@@ -114,7 +126,7 @@
         align-items: center;
       }
       #scrollupBtn {
-        bottom: 100px;
+        bottom: 90px;
       }
     </style>
   </head>
@@ -137,12 +149,12 @@
         <button class="btn" id="btnDriveLogin">🔑 구글 드라이브 로그인</button>
 
         <div class="select-group" id="selectContainer">
-          <label style="font-size: 13px; font-weight: bold">작품:</label>
+          <label style="font-size: 12px; font-weight: bold">작품:</label>
           <select id="parentFolderSelect">
             <option value="">-- 작품 폴더 선택 --</option>
           </select>
 
-          <label style="font-size: 13px; font-weight: bold">권:</label>
+          <label style="font-size: 12px; font-weight: bold">권:</label>
           <select id="subFolderSelect">
             <option value="">-- 작품을 먼저 선택하세요 --</option>
           </select>
@@ -175,7 +187,7 @@
         >
         <button
           onclick="resetFilters()"
-          style="padding: 2px 8px; cursor: pointer"
+          style="padding: 2px 6px; cursor: pointer; font-size: 12px;"
         >
           초기화
         </button>
@@ -305,7 +317,6 @@
         }
       };
 
-      // 🚀 [순차적 실시간 로딩] 이미지를 1장씩 차례대로 가져와서 바로바로 화면에 꽂아줌
       btnLoadImages.onclick = async () => {
         const selectedFolderId = subFolderSelect.value;
         if (!selectedFolderId) {
@@ -313,7 +324,7 @@
           return;
         }
 
-        viewer.innerHTML = '<p style="padding: 20px; color: #aaa;">이미지 목록 확인 중...</p>';
+        viewer.innerHTML = '<p id="loadingStatus" style="padding: 20px; color: #ff9800; font-weight: bold; font-size: 16px;">이미지 목록 확인 중...</p>';
 
         try {
           const query = `'${selectedFolderId}' in parents and mimeType contains 'image/' and trashed = false`;
@@ -325,18 +336,24 @@
           });
 
           const files = response.result.files;
-          viewer.innerHTML = "";
+          const totalFiles = files.length;
 
-          if (files.length === 0) {
+          if (totalFiles === 0) {
             viewer.innerHTML = "<p style='padding: 20px;'>선택한 폴더에 이미지 파일이 없습니다.</p>";
             return;
           }
 
           updateFilters();
 
-          // 1장씩 순서대로 다운로드 후 바로 화면에 추가 (첫 장부터 바로 볼 수 있음)
-          for (let i = 0; i < files.length; i++) {
+          for (let i = 0; i < totalFiles; i++) {
             const file = files[i];
+            const currentPercent = Math.round(((i + 1) / totalFiles) * 100);
+            
+            const statusEl = document.getElementById("loadingStatus");
+            if (statusEl) {
+              statusEl.innerText = `📖 로딩 중... (${i + 1} / ${totalFiles} 장 - ${currentPercent}%)`;
+            }
+
             try {
               const imgResponse = await fetch(
                 `https://www.googleapis.com/drive/v3/files/${file.id}?alt=media`,
@@ -349,12 +366,20 @@
                 const blob = await imgResponse.blob();
                 const img = document.createElement("img");
                 img.src = URL.createObjectURL(blob);
-                viewer.appendChild(img); // 받아지는 즉시 뷰어에 장착됨!
+                
+                if (i === 0 && statusEl) {
+                  statusEl.remove();
+                }
+                
+                viewer.appendChild(img); 
               }
             } catch (e) {
               console.error(`이미지 로드 실패 [${file.name}]:`, e);
             }
           }
+
+          const finalStatus = document.getElementById("loadingStatus");
+          if (finalStatus) finalStatus.remove();
 
         } catch (err) {
           console.error("이미지 전체 로드 에러:", err);
@@ -362,7 +387,6 @@
         }
       };
 
-      // --- 기존 필터 및 스크롤 로직 ---
       var showControl = true;
       document.addEventListener("click", (e) => {
         if (
@@ -418,10 +442,10 @@
       let scrollReq;
       let arrow = "";
 
-      const autoScroll = () => {
+      TheAutoScroll = () => {
         if (arrow === "up") window.scrollBy(0, -2);
         else window.scrollBy(0, 2);
-        scrollReq = requestAnimationFrame(autoScroll);
+        scrollReq = requestAnimationFrame(TheAutoScroll);
       };
 
       const stopScroll = () => {
@@ -431,30 +455,16 @@
         }
       };
 
-      scrollDownBtn.addEventListener("mousedown", () => {
-        arrow = "down";
-        if (!scrollReq) autoScroll();
-      });
+      scrollDownBtn.addEventListener("mousedown", () => { arrow = "down"; if (!scrollReq) TheAutoScroll(); });
       scrollDownBtn.addEventListener("mouseup", stopScroll);
       scrollDownBtn.addEventListener("mouseleave", stopScroll);
-      scrollDownBtn.addEventListener("touchstart", (e) => {
-        arrow = "down";
-        e.preventDefault();
-        if (!scrollReq) autoScroll();
-      });
+      scrollDownBtn.addEventListener("touchstart", (e) => { arrow = "down"; e.preventDefault(); if (!scrollReq) TheAutoScroll(); });
       scrollDownBtn.addEventListener("touchend", stopScroll);
 
-      scrollUpBtn.addEventListener("mousedown", () => {
-        arrow = "up";
-        if (!scrollReq) autoScroll();
-      });
+      scrollUpBtn.addEventListener("mousedown", () => { arrow = "up"; if (!scrollReq) TheAutoScroll(); });
       scrollUpBtn.addEventListener("mouseup", stopScroll);
       scrollUpBtn.addEventListener("mouseleave", stopScroll);
-      scrollUpBtn.addEventListener("touchstart", (e) => {
-        arrow = "up";
-        e.preventDefault();
-        if (!scrollReq) autoScroll();
-      });
+      scrollUpBtn.addEventListener("touchstart", (e) => { arrow = 'up'; e.preventDefault(); if (!scrollReq) TheAutoScroll(); });
       scrollUpBtn.addEventListener("touchend", stopScroll);
     </script>
   </body>
