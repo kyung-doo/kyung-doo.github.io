@@ -138,8 +138,9 @@
         viewer.innerHTML = ''; 
 
         const imageFiles = files
-            .filter(file => file.type.startsWith('image/'))
-            .sort((a, b) => a.name.localeCompare(b.name, undefined, {numeric: true}));
+          .filter(file => file.type.startsWith('image/'))
+          // a.name 대신 a.webkitRelativePath를 사용하여 폴더 구조까지 포함해 정렬합니다.
+          .sort((a, b) => a.webkitRelativePath.localeCompare(b.webkitRelativePath, undefined, {numeric: true}));
 
         if (imageFiles.length === 0) {
             alert('폴더에 이미지 파일이 없습니다.');
