@@ -16,7 +16,6 @@
         overflow-x: hidden;
       }
 
-      /* 브라우저 자체 확대(줌) 시에도 컨트롤 크기가 커지지 않도록 고정하는 컨테이너 */
       #control-wrapper {
         position: fixed;
         top: 0;
@@ -47,7 +46,7 @@
         align-items: center;
         width: 100%;
         max-width: 1200px;
-        margin-top: 105px; /* 상단 컨트롤 바 높이만큼 여백 확보 */
+        margin-top: 105px;
         transition: filter 0.1s ease-out;
       }
 
@@ -70,7 +69,6 @@
         padding: 8px 16px;
       }
 
-      /* 🚀 다음화 넘기기 전용 스타일 */
       #nextEpisodeContainer {
         width: 100%;
         padding: 40px 0;
@@ -79,18 +77,16 @@
         align-items: center;
       }
       #btnNextEpisode {
-        display: block;
-        width: 80%;
         background-color: #28a745;
         font-size: 16px;
         padding: 14px 28px;
         border-radius: 30px;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-        transition: background 0.2s, transform 0.2s;
+        display: block;
+        width: 80%;
       }
       #btnNextEpisode:hover {
         background-color: #218838;
-        transform: scale(1.05);
       }
 
       .select-group {
@@ -173,13 +169,10 @@
       </defs>
     </svg>
 
-    <!-- 컨트롤 크기 고정을 위한 래퍼 구조 -->
     <div id="control-wrapper">
       <div id="controls">
         <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: center;">
           <button class="btn" id="btnDriveLogin">🔑 구글 드라이브 로그인</button>
-
-          <!-- 로딩 상태 표시 영역 -->
           <span id="loadingStatus" style="color: #ff9800; font-weight: bold; font-size: 13px; display: none;"></span>
 
           <div class="select-group" id="selectContainer" style="margin-top: 0;">
@@ -198,33 +191,10 @@
         </div>
 
         <div class="slider-group">
-          <label
-            >명도:
-            <input
-              type="range"
-              id="valBrightness"
-              min="50"
-              max="150"
-              value="100"
-            />
-            <span id="txtBrightness">100%</span></label
-          >
-          <label
-            >대비:
-            <input type="range" id="valContrast" min="50" max="200" value="100" />
-            <span id="txtContrast">100%</span></label
-          >
-          <label style="color: #ff9800; font-weight: bold"
-            >샤픈:
-            <input type="range" id="valSharpen" min="0" max="100" value="0" />
-            <span id="txtSharpen">0%</span></label
-          >
-          <button
-            onclick="resetFilters()"
-            style="padding: 2px 6px; cursor: pointer; font-size: 12px;"
-          >
-            초기화
-          </button>
+          <label>명도: <input type="range" id="valBrightness" min="50" max="150" value="100" /> <span id="txtBrightness">100%</span></label>
+          <label>대비: <input type="range" id="valContrast" min="50" max="200" value="100" /> <span id="txtContrast">100%</span></label>
+          <label style="color: #ff9800; font-weight: bold">샤픈: <input type="range" id="valSharpen" min="0" max="100" value="0" /> <span id="txtSharpen">0%</span></label>
+          <button onclick="resetFilters()" style="padding: 2px 6px; cursor: pointer; font-size: 12px;">초기화</button>
         </div>
       </div>
     </div>
@@ -238,8 +208,7 @@
     <script src="https://apis.google.com/js/api.js" async defer></script>
 
     <script>
-      const CLIENT_ID =
-        "390191011438-nkn16tv7dnc167fukr55crl0domhsgcf.apps.googleusercontent.com";
+      const CLIENT_ID = "390191011438-nkn16tv7dnc167fukr55crl0domhsgcf.apps.googleusercontent.com";
       const API_KEY = "";
       const SCOPES = "https://www.googleapis.com/auth/drive.readonly";
 
@@ -254,15 +223,12 @@
       const viewer = document.getElementById("viewer");
       const loadingStatus = document.getElementById("loadingStatus");
 
-      // 🚀 모바일 기기 감지 및 스크롤 버튼 숨김 처리
       var isMobile = {
         Android: function () { return /Android/i.test(navigator.userAgent); },
         BlackBerry: function () { return /BlackBerry/i.test(navigator.userAgent); },
         iOS: function () { return /iPhone|iPad|iPod/i.test(navigator.userAgent); },
         Windows: function () { return /IEMobile/i.test(navigator.userAgent); },
-        any: function () {
-          return (isMobile.Android() || isMobile.BlackBerry() || isMobile.iOS() || isMobile.Windows());
-        }
+        any: function () { return (isMobile.Android() || isMobile.BlackBerry() || isMobile.iOS() || isMobile.Windows()); }
       };
 
       if (isMobile.any()) {
@@ -272,16 +238,10 @@
 
       window.onload = () => {
         gapi.load("client", () => {
-          gapi.client
-            .init({
-              apiKey: API_KEY,
-              discoveryDocs: [
-                "https://www.googleapis.com/discovery/v1/apis/drive/v3/rest",
-              ],
-            })
-            .then(() => {
-              console.log("GAPI 초기화 완료");
-            });
+          gapi.client.init({
+            apiKey: API_KEY,
+            discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"],
+          }).then(() => { console.log("GAPI 초기화 완료"); });
         });
 
         tokenClient = google.accounts.oauth2.initTokenClient({
@@ -307,12 +267,8 @@
 
       async function findComicRootFolder() {
         try {
-          const query =
-            "name = '만화' and mimeType = 'application/vnd.google-apps.folder' and trashed = false";
-          const response = await gapi.client.drive.files.list({
-            q: query,
-            pageSize: 5,
-          });
+          const query = "name = '만화' and mimeType = 'application/vnd.google-apps.folder' and trashed = false";
+          const response = await gapi.client.drive.files.list({ q: query, pageSize: 5 });
           const folders = response.result.files;
 
           if (folders.length === 0) {
@@ -328,45 +284,57 @@
       async function loadParentFolders(comicRootId) {
         try {
           const query = `'${comicRootId}' in parents and mimeType = 'application/vnd.google-apps.folder' and trashed = false`;
-          const response = await gapi.client.drive.files.list({
-            q: query,
-            orderBy: "name_natural",
-            pageSize: 100,
-          });
-          parentFolderSelect.innerHTML =
-            '<option value="">-- 작품 폴더 선택 --</option>';
+          const response = await gapi.client.drive.files.list({ q: query, orderBy: "name_natural", pageSize: 100 });
+          parentFolderSelect.innerHTML = '<option value="">-- 작품 폴더 선택 --</option>';
           response.result.files.forEach((folder) => {
             const opt = document.createElement("option");
             opt.value = folder.id;
             opt.innerText = folder.name;
             parentFolderSelect.appendChild(opt);
           });
+
+          // 🚀 저장된 이전 작품이 있다면 자동 선택 및 권 목록 로드
+          const savedParent = localStorage.getItem('last_parent_folder');
+          if (savedParent) {
+            parentFolderSelect.value = savedParent;
+            await loadSubFolders(savedParent, true);
+          }
         } catch (err) {
           console.error("작품 폴더 로드 에러:", err);
         }
       }
 
-      parentFolderSelect.onchange = async () => {
-        const parentId = parentFolderSelect.value;
+      async function loadSubFolders(parentId, autoSelect = false) {
         subFolderSelect.innerHTML = '<option value="">-- 권 선택 --</option>';
         if (!parentId) return;
 
         try {
           const query = `'${parentId}' in parents and mimeType = 'application/vnd.google-apps.folder' and trashed = false`;
-          const response = await gapi.client.drive.files.list({
-            q: query,
-            orderBy: "name_natural",
-            pageSize: 100,
-          });
+          const response = await gapi.client.drive.files.list({ q: query, orderBy: "name_natural", pageSize: 100 });
           response.result.files.forEach((folder) => {
             const opt = document.createElement("option");
             opt.value = folder.id;
             opt.innerText = folder.name;
             subFolderSelect.appendChild(opt);
           });
+
+          // 🚀 저장된 권이 있다면 자동 선택 후 불러오기 실행
+          if (autoSelect) {
+            const savedSub = localStorage.getItem('last_sub_folder');
+            if (savedSub) {
+              subFolderSelect.value = savedSub;
+              if (subFolderSelect.value) {
+                btnLoadImages.click();
+              }
+            }
+          }
         } catch (err) {
           console.error("권 폴더 로드 에러:", err);
         }
+      }
+
+      parentFolderSelect.onchange = async () => {
+        loadSubFolders(parentFolderSelect.value);
       };
 
       btnLoadImages.onclick = async () => {
@@ -375,6 +343,10 @@
           alert("불러올 권 폴더를 선택해주세요.");
           return;
         }
+
+        // 선택한 작품과 권 정보 저장
+        localStorage.setItem('last_parent_folder', parentFolderSelect.value);
+        localStorage.setItem('last_sub_folder', selectedFolderId);
 
         viewer.innerHTML = ""; 
         loadingStatus.style.display = "inline-block";
@@ -427,7 +399,7 @@
 
           loadingStatus.style.display = "none";
 
-          // 🚀 [추가 기능] 모든 이미지 로딩 완료 후 맨 마지막에 '다음화로 넘기기' 버튼 생성
+          // 다음화 넘기기 버튼 생성
           const nextIndex = subFolderSelect.selectedIndex + 1;
           if (nextIndex < subFolderSelect.options.length) {
             const nextDiv = document.createElement("div");
@@ -440,8 +412,9 @@
             
             nextBtn.onclick = () => {
               subFolderSelect.selectedIndex = nextIndex;
+              localStorage.setItem('last_sub_folder', subFolderSelect.value);
               window.scrollTo({ top: 0, behavior: 'smooth' });
-              btnLoadImages.click(); // 자동으로 불러오기 실행
+              btnLoadImages.click(); 
             };
 
             nextDiv.appendChild(nextBtn);
@@ -493,9 +466,7 @@
       };
 
       ["Brightness", "Contrast", "Sharpen"].forEach((type) => {
-        document
-          .getElementById(`val${type}`)
-          .addEventListener("input", updateFilters);
+        document.getElementById(`val${type}`).addEventListener("input", updateFilters);
       });
 
       window.resetFilters = () => {
