@@ -134,9 +134,7 @@
         padding: 0;
         border: none;
         background-color: #1f1f1f;
-        opacity: 0;
-        transition: opacity 0.3s ease-in-out;
-        /* will-change: opacity; */
+        visibility: hidden;
       }
 
       /* 🚀 찌그러짐 방지용 임시 뼈대 클래스 */
@@ -511,7 +509,7 @@
             
             imgElement.onload = () => {
               imgElement.classList.remove('img-placeholder'); // 🚀 로드 완료 시 강제 높이 해제! 찌그러짐 원천봉쇄
-              imgElement.style.opacity = "1";
+              imgElement.style.visibility = "visible";
             };
             imgElement.src = objectUrl;
           }
