@@ -335,11 +335,41 @@
             const fileRes = await fetch(`https://www.googleapis.com/drive/v3/files/${cloudSaveFileId}?alt=media`, {
               headers: { Authorization: `Bearer ${accessToken}` }
             });
-            const data = await fileRes.json();
-            for (const key in data) {
-              localStorage.setItem(key, data[key]);
+            const cloudData = await fileRes.json();
+            
+            // 🚀 [핵심] 드라이브 데이터와 현재 로컬 데이터를 비교하여 틀린(변경 된) 값이 있는지 검사
+            let hasChanged = false;
+            for (const key in cloudData) {
+              if (localStorage.getItem(key) !== cloudData[key]) {
+                hasChanged = true;
+                break;
+              }
             }
-            syncStatus.innerText = "☁️ 클라우드 동기화 완료";
+
+            if (hasChanged) {
+              console.log("🔄 변경된 클라우드 세이브 발견! 동기화 진행");
+              let prevSubId = localStorage.getItem(`book_sub_${parentFolderSelect.value}`);
+
+              // 로컬에 덮어쓰기
+              for (const key in cloudData) {
+                localStorage.setItem(key, cloudData[key]);
+              }
+              syncStatus.innerText = "☁️ 클라우드 동기화 완료";
+
+              // 만약 다른 기기에서 보던 '권(subFolder)'이나 작품이 바뀌었다면 화면도 자동으로 갱신
+              const newParent = localStorage.getItem('last_parent_folder');
+              const newSubId = localStorage.getItem(`book_sub_${newParent}`);
+
+              if (newParent && newParent !== parentFolderSelect.value) {
+                parentFolderSelect.value = newParent;
+                parentFolderSelect.dispatchEvent(new Event('change'));
+              } else if (newSubId && newSubId !== prevSubId && subFolderSelect.value) {
+                subFolderSelect.value = newSubId;
+                btnLoadImages.click(); // 바뀐 권으로 자동 재로드
+              }
+            } else {
+              syncStatus.innerText = "☁️ 최신 상태 유지 중";
+            }
           } else {
             syncStatus.innerText = "☁️ 새 세이브 준비";
           }
@@ -347,7 +377,7 @@
           console.error("동기화 로드 실패:", e);
           syncStatus.innerText = "☁️ 동기화 오류";
         }
-        setTimeout(() => { syncStatus.innerText = ""; }, 3000);
+        setTimeout(() => { syncStatus.innerText = ""; }, 2000);
       }
 
       let cloudSyncTimer;
