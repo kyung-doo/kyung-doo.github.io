@@ -122,6 +122,10 @@
       input[type="range"] {
         width: 90px;
       }
+      
+      #viewer {
+        background-color: #fcfbfb;
+      }
 
       /* 🚀 모바일 깜빡임 및 레이아웃 튐 현상 극복을 위한 최적화 CSS */
       #viewer img {
@@ -137,6 +141,7 @@
         background-color: #1a1a1a; /* 배경색을 뷰어와 동일하게 주어 빈 공간 튐 방지 */
         opacity: 0;
         transition: opacity 0.2s ease-in;
+        content-visibility: auto; /* 화면 밖 렌더링 최적화 */
       }
 
       .img-placeholder {
