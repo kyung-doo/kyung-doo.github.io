@@ -16,6 +16,7 @@
         overflow-x: hidden;
       }
 
+      /* 브라우저 자체 확대(줌) 시에도 컨트롤 크기가 커지지 않도록 고정하는 컨테이너 */
       #control-wrapper {
         position: fixed;
         top: 0;
@@ -46,7 +47,7 @@
         align-items: center;
         width: 100%;
         max-width: 1200px;
-        margin-top: 105px;
+        margin-top: 105px; /* 상단 컨트롤 바 높이만큼 여백 확보 */
         transition: filter 0.1s ease-out;
       }
 
@@ -122,14 +123,19 @@
         width: 90px;
       }
 
-      /* 🚀 조각 이미지 플레이스홀더 및 로딩 전 기본 스타일 */
+      /* 🚀 조각 이미지 간 틈새 및 튐 현상을 없애고 완벽히 밀착시키는 스타일 */
       #viewer img {
+        display: block;
+        width: 100%;
         max-width: 100%;
-        min-height: 400px; /* 이미지가 로드되기 전에도 스크롤 위치를 잡을 수 있도록 기본 높이 확보 */
-        background-color: #222;
-        object-fit: contain;
+        height: auto;
+        vertical-align: top;
         image-rendering: -webkit-optimize-contrast;
-        margin-bottom: -1px;
+        margin: 0;
+        padding: 0;
+        border: none;
+        background-color: transparent;
+        transition: opacity 0.2s ease-in;
       }
 
       #scrollDownBtn,
@@ -237,6 +243,7 @@
         document.getElementById("scrollupBtn").style.display = "none";
       }
 
+      // 페이지 로드시 저장된 필터 값 복원
       window.addEventListener('DOMContentLoaded', () => {
         const savedB = localStorage.getItem('filter_brightness');
         const savedC = localStorage.getItem('filter_contrast');
@@ -326,6 +333,7 @@
             subFolderSelect.appendChild(opt);
           });
 
+          // 작품별 마지막 권 확인 및 이어보기 컨펌창
           const savedSubId = localStorage.getItem(`book_sub_${parentId}`);
           if (savedSubId) {
             let targetOptionName = "";
@@ -348,7 +356,7 @@
         }
       };
 
-      // 🚀 조각 이미지별 실시간 스크롤 위치 추적 (어떤 조각을 보고 있는지 감지)
+      // 스크롤 시 현재 보고 있는 조각 이미지 위치 실시간 저장
       let scrollSaveTimer;
       window.addEventListener('scroll', () => {
         clearTimeout(scrollSaveTimer);
@@ -359,7 +367,6 @@
           let currentIndex = 0;
           for (let i = 0; i < imgs.length; i++) {
             const rect = imgs[i].getBoundingClientRect();
-            // 화면 상단 근처에 있는 조각 이미지 찾기
             if (rect.bottom >= 0) {
               currentIndex = imgs[i].getAttribute('data-index');
               break;
@@ -373,7 +380,7 @@
         }, 300);
       });
 
-      // 🚀 개별 조각 이미지를 필요할 때(화면에 보일 때) 구글 드라이브에서 다운로드받아 채워주는 Lazy Loader
+      // 개별 조각 이미지 Lazy Loading 함수 (로드 완료 시 페이드인)
       async function fetchAndSetImage(imgElement, fileId) {
         if (imgElement.dataset.loaded === "true") return;
         imgElement.dataset.loaded = "true";
@@ -388,11 +395,17 @@
 
           if (imgResponse.ok) {
             const blob = await imgResponse.blob();
-            imgElement.src = URL.createObjectURL(blob);
+            const objectUrl = URL.createObjectURL(blob);
+            
+            imgElement.onload = () => {
+              imgElement.style.opacity = "1";
+            };
+            imgElement.style.opacity = "0";
+            imgElement.src = objectUrl;
           }
         } catch (e) {
           console.error(`조각 이미지 로드 실패 [${fileId}]:`, e);
-          imgElement.dataset.loaded = "false"; // 실패 시 재시도 가능하게 초기화
+          imgElement.dataset.loaded = "false";
         }
       }
 
@@ -411,7 +424,6 @@
         loadingStatus.innerText = "🔍 이미지 목록 구성 중...";
 
         try {
-          // 1단계: 드라이브에서 '조각 이미지 파일 목록'만 빠르게 먼저 가져옴 (이미지 데이터를 직접 다운로드하지 않음)
           const query = `'${selectedFolderId}' in parents and mimeType contains 'image/' and trashed = false`;
           const response = await gapi.client.drive.files.list({
             q: query,
@@ -432,17 +444,16 @@
           updateFilters();
           loadingStatus.style.display = "none";
 
-          // 2단계: 뼈대(img 태그 틀)만 먼저 싹 만들어 둠 (높이가 미리 잡히므로 스크롤바가 생김)
           const observer = new IntersectionObserver((entries, obs) => {
             entries.forEach(entry => {
               if (entry.isIntersecting) {
                 const img = entry.target;
                 const fileId = img.getAttribute('data-fileid');
-                fetchAndSetImage(img, fileId); // 화면에 들어오는 순간 드라이브에서 이미지 가져오기
-                obs.unobserve(img); // 한 번 로드된 이미지는 관찰 해제
+                fetchAndSetImage(img, fileId);
+                obs.unobserve(img);
               }
             });
-          }, { rootMargin: '300px 0px' /* 화면에 들어오기 300px 전에 미리 로딩 시작 */ });
+          }, { rootMargin: '300px 0px' });
 
           for (let i = 0; i < totalFiles; i++) {
             const file = files[i];
@@ -450,10 +461,10 @@
             img.setAttribute('data-fileid', file.id);
             img.setAttribute('data-index', i);
             viewer.appendChild(img);
-            observer.observe(img); // 감시 시작
+            observer.observe(img);
           }
 
-          // 3단계: 저장된 이전 조각 위치가 있다면 해당 조각으로 즉시 스크롤 점프
+          // 저장된 조각 위치로 자동 점프
           const savedPieceIndex = localStorage.getItem(`piece_pos_${parentId}_${selectedFolderId}`);
           if (savedPieceIndex !== null) {
             setTimeout(() => {
@@ -464,7 +475,6 @@
             }, 100);
           }
 
-          // 다음화 넘기기 버튼 추가 (맨 마지막 조각 아래에 위치)
           const nextIndex = subFolderSelect.selectedIndex + 1;
           if (nextIndex < subFolderSelect.options.length) {
             const nextDiv = document.createElement("div");
@@ -478,7 +488,7 @@
             nextBtn.onclick = () => {
               subFolderSelect.selectedIndex = nextIndex;
               localStorage.setItem(`book_sub_${parentId}`, subFolderSelect.value);
-              localStorage.setItem(`piece_pos_${parentId}_${subFolderSelect.value}`, 0); // 다음화는 맨 처음부터
+              localStorage.setItem(`piece_pos_${parentId}_${subFolderSelect.value}`, 0);
               window.scrollTo({ top: 0, behavior: 'smooth' });
               btnLoadImages.click(); 
             };
