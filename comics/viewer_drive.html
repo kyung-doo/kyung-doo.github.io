@@ -16,7 +16,6 @@
         overflow-x: hidden;
       }
 
-      /* 브라우저 자체 확대(줌) 시에도 컨트롤 크기가 커지지 않도록 고정하는 컨테이너 */
       #control-wrapper {
         position: fixed;
         top: 0;
@@ -47,7 +46,7 @@
         align-items: center;
         width: 100%;
         max-width: 1200px;
-        margin-top: 105px; /* 상단 컨트롤 바 높이만큼 여백 확보 */
+        margin-top: 105px;
         transition: filter 0.1s ease-out;
       }
 
@@ -72,10 +71,11 @@
 
       #nextEpisodeContainer {
         width: 100%;
-        padding: 40px 0;
+        padding: 50px 0;
         display: flex;
         justify-content: center;
         align-items: center;
+        background-color: #1a1a1a;
       }
       #btnNextEpisode {
         background-color: #28a745;
@@ -123,19 +123,21 @@
         width: 90px;
       }
 
-      /* 🚀 조각 이미지 간 틈새 및 튐 현상을 없애고 완벽히 밀착시키는 스타일 */
+      /* 조각 이미지 틈새 억제 및 깜빡임 방지 */
       #viewer img {
         display: block;
         width: 100%;
         max-width: 100%;
+        min-height: 400px; /* 로딩 전 빈 공간 확보 */
         height: auto;
         vertical-align: top;
         image-rendering: -webkit-optimize-contrast;
         margin: 0;
         padding: 0;
         border: none;
-        background-color: transparent;
-        transition: opacity 0.2s ease-in;
+        background-color: #1f1f1f;
+        opacity: 0;
+        transition: opacity 0.3s ease-in-out;
       }
 
       #scrollDownBtn,
@@ -221,6 +223,7 @@
 
       let tokenClient;
       let accessToken = null;
+      let isRestoringScroll = false; // 🚀 스크롤 복원 중일 때 위치 저장을 막는 잠금 변수
 
       const btnDriveLogin = document.getElementById("btnDriveLogin");
       const selectContainer = document.getElementById("selectContainer");
@@ -243,7 +246,6 @@
         document.getElementById("scrollupBtn").style.display = "none";
       }
 
-      // 페이지 로드시 저장된 필터 값 복원
       window.addEventListener('DOMContentLoaded', () => {
         const savedB = localStorage.getItem('filter_brightness');
         const savedC = localStorage.getItem('filter_contrast');
@@ -333,7 +335,6 @@
             subFolderSelect.appendChild(opt);
           });
 
-          // 작품별 마지막 권 확인 및 이어보기 컨펌창
           const savedSubId = localStorage.getItem(`book_sub_${parentId}`);
           if (savedSubId) {
             let targetOptionName = "";
@@ -356,9 +357,11 @@
         }
       };
 
-      // 스크롤 시 현재 보고 있는 조각 이미지 위치 실시간 저장
+      // 🚀 위치 저장 로직: 복원 중(isRestoringScroll)일 때는 저장을 완전 차단!
       let scrollSaveTimer;
       window.addEventListener('scroll', () => {
+        if (isRestoringScroll) return; // 💡 복원 중일 때는 스크롤이 흔들려도 저장 무시
+
         clearTimeout(scrollSaveTimer);
         scrollSaveTimer = setTimeout(() => {
           const imgs = viewer.querySelectorAll('img[data-index]');
@@ -374,13 +377,12 @@
           }
           const parentId = parentFolderSelect.value;
           const subId = subFolderSelect.value;
-          if (parentId && subId) {
+          if (parentId && subId && currentIndex > 0) {
             localStorage.setItem(`piece_pos_${parentId}_${subId}`, currentIndex);
           }
         }, 300);
       });
 
-      // 개별 조각 이미지 Lazy Loading 함수 (로드 완료 시 페이드인)
       async function fetchAndSetImage(imgElement, fileId) {
         if (imgElement.dataset.loaded === "true") return;
         imgElement.dataset.loaded = "true";
@@ -400,7 +402,6 @@
             imgElement.onload = () => {
               imgElement.style.opacity = "1";
             };
-            imgElement.style.opacity = "0";
             imgElement.src = objectUrl;
           }
         } catch (e) {
@@ -432,7 +433,14 @@
             fields: "files(id, name)",
           });
 
-          const files = response.result.files;
+          let files = response.result.files;
+
+          files.sort((a, b) => {
+            const numA = parseInt(a.name.replace(/[^0-9]/g, '')) || 0;
+            const numB = parseInt(b.name.replace(/[^0-9]/g, '')) || 0;
+            return numA - numB;
+          });
+
           const totalFiles = files.length;
 
           if (totalFiles === 0) {
@@ -453,7 +461,7 @@
                 obs.unobserve(img);
               }
             });
-          }, { rootMargin: '300px 0px' });
+          }, { rootMargin: '600px 0px' }); // 여유 공간 넉넉히
 
           for (let i = 0; i < totalFiles; i++) {
             const file = files[i];
@@ -464,15 +472,30 @@
             observer.observe(img);
           }
 
-          // 저장된 조각 위치로 자동 점프
+          // 🚀 저장된 위치로 복원하는 강력한 '타겟 락온(Lock-On)' 로직
           const savedPieceIndex = localStorage.getItem(`piece_pos_${parentId}_${selectedFolderId}`);
-          if (savedPieceIndex !== null) {
-            setTimeout(() => {
-              const targetImg = viewer.querySelector(`img[data-index="${savedPieceIndex}"]`);
-              if (targetImg) {
+          
+          if (savedPieceIndex !== null && parseInt(savedPieceIndex) > 0) {
+            isRestoringScroll = true; // 복원 시작! 오작동 저장 차단
+            
+            const targetImg = viewer.querySelector(`img[data-index="${savedPieceIndex}"]`);
+            if (targetImg) {
+              // 밀림 현상이 끝날 때까지 0.2초 간격으로 총 8번(약 1.6초) 타겟 위치로 멱살 잡고 끌고 옴
+              let attempts = 0;
+              const lockOnInterval = setInterval(() => {
                 targetImg.scrollIntoView({ behavior: 'auto' });
-              }
-            }, 100);
+                attempts++;
+                if (attempts >= 8) {
+                  clearInterval(lockOnInterval);
+                  // 락온이 풀린 후 살짝 딜레이를 주고 저장 기능 다시 활성화
+                  setTimeout(() => { isRestoringScroll = false; }, 300);
+                }
+              }, 200);
+            } else {
+              isRestoringScroll = false;
+            }
+          } else {
+            isRestoringScroll = false;
           }
 
           const nextIndex = subFolderSelect.selectedIndex + 1;
@@ -488,6 +511,7 @@
             nextBtn.onclick = () => {
               subFolderSelect.selectedIndex = nextIndex;
               localStorage.setItem(`book_sub_${parentId}`, subFolderSelect.value);
+              // 💡 다음 권으로 넘어갈 땐 새 권의 위치를 0번(맨 처음)으로 초기화
               localStorage.setItem(`piece_pos_${parentId}_${subFolderSelect.value}`, 0);
               window.scrollTo({ top: 0, behavior: 'smooth' });
               btnLoadImages.click(); 
