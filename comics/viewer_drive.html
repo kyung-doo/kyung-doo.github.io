@@ -304,23 +304,6 @@
         tokenClient.requestAccessToken({ prompt: "consent" });
       };
 
-      document.addEventListener("visibilitychange", async () => {
-        if (document.visibilityState === "visible" && accessToken) {
-          console.log("👀 화면 재활성화 감지: 클라우드 상태 최신화 중...");
-          await syncFromCloud();
-          if (subFolderSelect.value && viewer.children.length > 0) {
-            btnLoadImages.click();
-          }
-        }
-      });
-
-      window.addEventListener("focus", async () => {
-        if (accessToken) {
-          console.log("✨ 윈도우 포커스 감지: 클라우드 상태 동기화 중...");
-          await syncFromCloud();
-        }
-      });
-
       async function syncFromCloud() {
         syncStatus.innerText = "☁️ 동기화 확인 중...";
         try {
@@ -337,7 +320,6 @@
             });
             const cloudData = await fileRes.json();
             
-            // 🚀 [핵심] 드라이브 데이터와 현재 로컬 데이터를 비교하여 틀린(변경 된) 값이 있는지 검사
             let hasChanged = false;
             for (const key in cloudData) {
               if (localStorage.getItem(key) !== cloudData[key]) {
@@ -347,26 +329,14 @@
             }
 
             if (hasChanged) {
-              console.log("🔄 변경된 클라우드 세이브 발견! 동기화 진행");
-              let prevSubId = localStorage.getItem(`book_sub_${parentFolderSelect.value}`);
-
-              // 로컬에 덮어쓰기
+              console.log("🔄 변경된 클라우드 세이브 발견! 내부 데이터 갱신 완료");
               for (const key in cloudData) {
                 localStorage.setItem(key, cloudData[key]);
               }
               syncStatus.innerText = "☁️ 클라우드 동기화 완료";
 
-              // 만약 다른 기기에서 보던 '권(subFolder)'이나 작품이 바뀌었다면 화면도 자동으로 갱신
-              const newParent = localStorage.getItem('last_parent_folder');
-              const newSubId = localStorage.getItem(`book_sub_${newParent}`);
-
-              if (newParent && newParent !== parentFolderSelect.value) {
-                parentFolderSelect.value = newParent;
-                parentFolderSelect.dispatchEvent(new Event('change'));
-              } else if (newSubId && newSubId !== prevSubId && subFolderSelect.value) {
-                subFolderSelect.value = newSubId;
-                btnLoadImages.click(); // 바뀐 권으로 자동 재로드
-              }
+              // 🚀 [수정] 로그인 시 자동으로 컨펌창이 터지는 것을 막기 위해 UI 강제 변경 로직 제거
+              // 겉 화면은 그대로 두고 백그라운드 데이터(localStorage)만 조용히 최신 상태로 맞춰둡니다.
             } else {
               syncStatus.innerText = "☁️ 최신 상태 유지 중";
             }
@@ -453,11 +423,8 @@
             parentFolderSelect.appendChild(opt);
           });
 
-          const savedParent = localStorage.getItem('last_parent_folder');
-          if (savedParent) {
-            parentFolderSelect.value = savedParent;
-            parentFolderSelect.dispatchEvent(new Event('change'));
-          }
+          // 🚀 [수정] 로그인 직후 강제로 이전 책을 선택하고 알림창을 띄우던 부분을 삭제했습니다.
+          // 이제 처음에 로그인하면 '-- 작품 폴더 선택 --' 상태로 조용히 대기합니다.
         } catch (err) {
           console.error("작품 폴더 로드 에러:", err);
         }
@@ -483,6 +450,7 @@
             subFolderSelect.appendChild(opt);
           });
 
+          // 🚀 [복원] 사용자가 '직접' 콤보박스에서 작품을 선택했을 때만 이어보기 컨펌창 띄움!
           const savedSubId = localStorage.getItem(`book_sub_${parentId}`);
           if (savedSubId) {
             let targetOptionName = "";
