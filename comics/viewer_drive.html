@@ -136,10 +136,7 @@
         background-color: #1f1f1f;
         opacity: 0;
         transition: opacity 0.3s ease-in-out;
-        
-        /* 🚀 추가된 핵심 설정: 브라우저가 각 이미지를 독립된 GPU 레이어로 처리하여 튀거나 숨는 현상 원천 차단 */
-        transform: translateZ(0);
-        will-change: opacity;
+        /* will-change: opacity; */
       }
 
       /* 🚀 찌그러짐 방지용 임시 뼈대 클래스 */
