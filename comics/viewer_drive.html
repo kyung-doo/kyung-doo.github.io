@@ -123,6 +123,7 @@
         width: 90px;
       }
 
+      /* 🚀 모바일 깜빡임 및 레이아웃 튐 현상 극복을 위한 최적화 CSS */
       #viewer img {
         display: block;
         width: 100%;
@@ -133,13 +134,14 @@
         margin: 0;
         padding: 0;
         border: none;
-        background-color: #1f1f1f;
+        background-color: #1a1a1a; /* 배경색을 뷰어와 동일하게 주어 빈 공간 튐 방지 */
         opacity: 0;
-        transition: opacity 0.3s ease-in-out;
+        transition: opacity 0.2s ease-in;
+        content-visibility: auto; /* 화면 밖 렌더링 최적화 */
       }
 
       .img-placeholder {
-        min-height: 400px;
+        min-height: 450px; /* 로딩 전 기본 공간 확보 */
       }
 
       #scrollDownBtn,
@@ -302,15 +304,20 @@
         tokenClient.requestAccessToken({ prompt: "consent" });
       };
 
-      // 🚀 [추가] 앱이 깨어나거나 화면이 다시 보일 때 드라이브 토큰 유효성 체크 및 데이터 동기화
       document.addEventListener("visibilitychange", async () => {
         if (document.visibilityState === "visible" && accessToken) {
           console.log("👀 화면 재활성화 감지: 클라우드 상태 최신화 중...");
           await syncFromCloud();
-          // 만약 이미지를 보고 있던 상태였다면 조용히 데이터를 다시 불러와서 싱크 맞춤
           if (subFolderSelect.value && viewer.children.length > 0) {
             btnLoadImages.click();
           }
+        }
+      });
+
+      window.addEventListener("focus", async () => {
+        if (accessToken) {
+          console.log("✨ 윈도우 포커스 감지: 클라우드 상태 동기화 중...");
+          await syncFromCloud();
         }
       });
 
@@ -563,6 +570,7 @@
           updateFiltersUIOnly();
           loadingStatus.style.display = "none";
 
+          // 🚀 [핵심 개선] 관찰 범위를 1200px로 대폭 늘려 미리미리 로딩되도록 설정
           const observer = new IntersectionObserver((entries, obs) => {
             entries.forEach(entry => {
               if (entry.isIntersecting) {
@@ -572,7 +580,7 @@
                 obs.unobserve(img);
               }
             });
-          }, { rootMargin: '600px 0px' }); 
+          }, { rootMargin: '1200px 0px' }); 
 
           for (let i = 0; i < totalFiles; i++) {
             const file = files[i];
