@@ -545,15 +545,23 @@
             const blob = await imgResponse.blob();
             const objectUrl = URL.createObjectURL(blob);
             
-            imgElement.onload = () => {
-              imgElement.classList.remove('img-placeholder');
-              imgElement.style.opacity = "1";
+            // 🚀 백그라운드 디코딩 처리 (화면 멈춤, 깜빡임 방지)
+            imgElement.onload = async () => {
+              try {
+                // 이미지를 그리기 전에 백그라운드에서 압축 해제 (이게 깜빡임 방지의 핵심!)
+                await imgElement.decode(); 
+              } catch (err) {
+                console.warn("디코딩 에러(무시 가능):", err);
+              }
+              imgElement.classList.remove('img-placeholder'); // 뼈대 높이 제거
+              imgElement.style.opacity = "1"; // 디코딩 완료 후 부드럽게 페이드인
             };
+            
             imgElement.src = objectUrl;
           }
         } catch (e) {
           console.error(`조각 이미지 로드 실패 [${fileId}]:`, e);
-          imgElement.dataset.loaded = "false";
+          imgElement.dataset.loaded = "false"; // 실패하면 나중에 다시 시도할 수 있게 해제
         }
       }
 
