@@ -128,7 +128,6 @@
         display: block;
         width: 100%;
         max-width: 100%;
-        min-height: 400px; /* 로딩 전 빈 공간 확보 */
         height: auto;
         vertical-align: top;
         image-rendering: -webkit-optimize-contrast;
@@ -138,6 +137,9 @@
         background-color: #1f1f1f;
         opacity: 0;
         transition: opacity 0.3s ease-in-out;
+      }
+      .img-placeholder {
+        min-height: 300px; 
       }
 
       #scrollDownBtn,
@@ -400,6 +402,7 @@
             const objectUrl = URL.createObjectURL(blob);
             
             imgElement.onload = () => {
+              imgElement.classList.remove('img-placeholder'); // 💡 로드 완료 시 강제 높이 해제! (비율 원상복구)
               imgElement.style.opacity = "1";
             };
             imgElement.src = objectUrl;
@@ -468,6 +471,7 @@
             const img = document.createElement("img");
             img.setAttribute('data-fileid', file.id);
             img.setAttribute('data-index', i);
+            img.classList.add('img-placeholder'); // 💡 임시 높이 클래스 추가
             viewer.appendChild(img);
             observer.observe(img);
           }
