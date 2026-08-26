@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>만화 뷰어 (구글 드라이브 연동형)</title>
+    <title>만화 뷰어 (구글 클라우드 동기화)</title>
     <style>
       body {
         background-color: #1a1a1a;
@@ -123,7 +123,6 @@
         width: 90px;
       }
 
-      /* 조각 이미지 틈새 억제 및 깜빡임 방지 */
       #viewer img {
         display: block;
         width: 100%;
@@ -138,8 +137,10 @@
         opacity: 0;
         transition: opacity 0.3s ease-in-out;
       }
+
+      /* 🚀 찌그러짐 방지용 임시 뼈대 클래스 */
       .img-placeholder {
-        min-height: 300px; 
+        min-height: 400px;
       }
 
       #scrollDownBtn,
@@ -164,6 +165,13 @@
       #scrollupBtn {
         bottom: 90px;
       }
+      
+      /* 동기화 상태 아이콘 */
+      #syncStatus {
+        font-size: 12px;
+        color: #aaa;
+        margin-left: 10px;
+      }
     </style>
   </head>
   <body>
@@ -185,6 +193,7 @@
         <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: center;">
           <button class="btn" id="btnDriveLogin">🔑 구글 드라이브 로그인</button>
           <span id="loadingStatus" style="color: #ff9800; font-weight: bold; font-size: 13px; display: none;"></span>
+          <span id="syncStatus"></span>
 
           <div class="select-group" id="selectContainer" style="margin-top: 0;">
             <label style="font-size: 12px; font-weight: bold">작품:</label>
@@ -221,11 +230,13 @@
     <script>
       const CLIENT_ID = "390191011438-nkn16tv7dnc167fukr55crl0domhsgcf.apps.googleusercontent.com";
       const API_KEY = "";
-      const SCOPES = "https://www.googleapis.com/auth/drive.readonly";
+      // 🚀 드라이브 앱 데이터 접근 권한(appdata) 추가!
+      const SCOPES = "https://www.googleapis.com/auth/drive.readonly https://www.googleapis.com/auth/drive.appdata";
 
       let tokenClient;
       let accessToken = null;
-      let isRestoringScroll = false; // 🚀 스크롤 복원 중일 때 위치 저장을 막는 잠금 변수
+      let isRestoringScroll = false;
+      let cloudSaveFileId = null; // 클라우드 세이브 파일 ID
 
       const btnDriveLogin = document.getElementById("btnDriveLogin");
       const selectContainer = document.getElementById("selectContainer");
@@ -234,6 +245,7 @@
       const btnLoadImages = document.getElementById("btnLoadImages");
       const viewer = document.getElementById("viewer");
       const loadingStatus = document.getElementById("loadingStatus");
+      const syncStatus = document.getElementById("syncStatus");
 
       var isMobile = {
         Android: function () { return /Android/i.test(navigator.userAgent); },
@@ -248,7 +260,7 @@
         document.getElementById("scrollupBtn").style.display = "none";
       }
 
-      window.addEventListener('DOMContentLoaded', () => {
+      function restoreLocalFilters() {
         const savedB = localStorage.getItem('filter_brightness');
         const savedC = localStorage.getItem('filter_contrast');
         const savedSh = localStorage.getItem('filter_sharpen');
@@ -256,8 +268,10 @@
         if (savedB !== null) document.getElementById("valBrightness").value = savedB;
         if (savedC !== null) document.getElementById("valContrast").value = savedC;
         if (savedSh !== null) document.getElementById("valSharpen").value = savedSh;
-        updateFilters();
-      });
+        updateFiltersUIOnly(); 
+      }
+
+      window.addEventListener('DOMContentLoaded', restoreLocalFilters);
 
       window.onload = () => {
         gapi.load("client", () => {
@@ -270,7 +284,7 @@
         tokenClient = google.accounts.oauth2.initTokenClient({
           client_id: CLIENT_ID,
           scope: SCOPES,
-          callback: (resp) => {
+          callback: async (resp) => {
             if (resp.error !== undefined) {
               alert("로그인 실패: " + resp.message);
               return;
@@ -279,14 +293,99 @@
             btnDriveLogin.innerText = "✅ 드라이브 연동됨";
             btnDriveLogin.style.backgroundColor = "#28a745";
             selectContainer.style.display = "flex";
+            
+            // 🚀 로그인 직후, 구글 드라이브에서 저장된 상태를 싹 다 끌고 옵니다.
+            await syncFromCloud();
+            restoreLocalFilters(); // 필터 재적용
             findComicRootFolder();
           },
         });
       };
 
       btnDriveLogin.onclick = () => {
-        tokenClient.requestAccessToken({ prompt: "consent" });
+        tokenClient.requestAccessToken({ prompt: "consent" }); // 권한 변경됐으므로 consent 띄움
       };
+
+      // ==========================================
+      // 🚀 클라우드 동기화 (Cloud Save) 시스템
+      // ==========================================
+      async function syncFromCloud() {
+        syncStatus.innerText = "☁️ 동기화 확인 중...";
+        try {
+          const response = await gapi.client.drive.files.list({
+            spaces: 'appDataFolder',
+            q: "name = 'comic_viewer_save.json'",
+            fields: 'files(id)'
+          });
+          const files = response.result.files;
+          if (files && files.length > 0) {
+            cloudSaveFileId = files[0].id;
+            const fileRes = await fetch(`https://www.googleapis.com/drive/v3/files/${cloudSaveFileId}?alt=media`, {
+              headers: { Authorization: `Bearer ${accessToken}` }
+            });
+            const data = await fileRes.json();
+            // 클라우드 데이터를 현재 기기에 덮어쓰기
+            for (const key in data) {
+              localStorage.setItem(key, data[key]);
+            }
+            syncStatus.innerText = "☁️ 클라우드 불러오기 완료";
+          } else {
+            syncStatus.innerText = "☁️ 새 동기화 생성 준비";
+          }
+        } catch (e) {
+          console.error("동기화 로드 실패:", e);
+          syncStatus.innerText = "☁️ 동기화 오류";
+        }
+        setTimeout(() => { syncStatus.innerText = ""; }, 3000);
+      }
+
+      let cloudSyncTimer;
+      async function syncToCloud() {
+        if (!accessToken) return;
+        clearTimeout(cloudSyncTimer);
+        
+        syncStatus.innerText = "☁️ 저장 대기 중...";
+        // 2초간 추가 조작이 없으면 그때 드라이브에 업로드 (부하 방지)
+        cloudSyncTimer = setTimeout(async () => {
+          syncStatus.innerText = "☁️ 클라우드 저장 중...";
+          const saveData = {};
+          for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key.startsWith('last_') || key.startsWith('piece_pos_') || key.startsWith('book_sub_') || key.startsWith('filter_')) {
+              saveData[key] = localStorage.getItem(key);
+            }
+          }
+          const fileContent = JSON.stringify(saveData);
+
+          try {
+            if (cloudSaveFileId) {
+              await fetch(`https://www.googleapis.com/upload/drive/v3/files/${cloudSaveFileId}?uploadType=media`, {
+                method: 'PATCH',
+                headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+                body: fileContent
+              });
+            } else {
+              // 처음 저장 시 껍데기 파일 먼저 생성
+              const res = await gapi.client.drive.files.create({
+                resource: { name: 'comic_viewer_save.json', parents: ['appDataFolder'] },
+                fields: 'id'
+              });
+              cloudSaveFileId = res.result.id;
+              await fetch(`https://www.googleapis.com/upload/drive/v3/files/${cloudSaveFileId}?uploadType=media`, {
+                method: 'PATCH',
+                headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+                body: fileContent
+              });
+            }
+            syncStatus.innerText = "☁️ 모든 기기 동기화 완료";
+            setTimeout(() => { syncStatus.innerText = ""; }, 2000);
+          } catch (e) {
+            console.error("클라우드 저장 실패:", e);
+            syncStatus.innerText = "☁️ 동기화 실패";
+          }
+        }, 2000); 
+      }
+      // ==========================================
 
       async function findComicRootFolder() {
         try {
@@ -315,6 +414,13 @@
             opt.innerText = folder.name;
             parentFolderSelect.appendChild(opt);
           });
+
+          // 클라우드에서 받아온 작품 셋팅
+          const savedParent = localStorage.getItem('last_parent_folder');
+          if (savedParent) {
+            parentFolderSelect.value = savedParent;
+            parentFolderSelect.dispatchEvent(new Event('change'));
+          }
         } catch (err) {
           console.error("작품 폴더 로드 에러:", err);
         }
@@ -324,6 +430,9 @@
         const parentId = parentFolderSelect.value;
         subFolderSelect.innerHTML = '<option value="">-- 권 선택 --</option>';
         if (!parentId) return;
+
+        localStorage.setItem('last_parent_folder', parentId);
+        syncToCloud(); // 🚀 변경 시 동기화
 
         try {
           const query = `'${parentId}' in parents and mimeType = 'application/vnd.google-apps.folder' and trashed = false`;
@@ -359,10 +468,9 @@
         }
       };
 
-      // 🚀 위치 저장 로직: 복원 중(isRestoringScroll)일 때는 저장을 완전 차단!
       let scrollSaveTimer;
       window.addEventListener('scroll', () => {
-        if (isRestoringScroll) return; // 💡 복원 중일 때는 스크롤이 흔들려도 저장 무시
+        if (isRestoringScroll) return;
 
         clearTimeout(scrollSaveTimer);
         scrollSaveTimer = setTimeout(() => {
@@ -381,6 +489,7 @@
           const subId = subFolderSelect.value;
           if (parentId && subId && currentIndex > 0) {
             localStorage.setItem(`piece_pos_${parentId}_${subId}`, currentIndex);
+            syncToCloud(); // 🚀 위치가 바뀔 때마다 백그라운드 동기화
           }
         }, 300);
       });
@@ -392,9 +501,7 @@
         try {
           const imgResponse = await fetch(
             `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`,
-            {
-              headers: { Authorization: `Bearer ${accessToken}` },
-            },
+            { headers: { Authorization: `Bearer ${accessToken}` } }
           );
 
           if (imgResponse.ok) {
@@ -402,7 +509,7 @@
             const objectUrl = URL.createObjectURL(blob);
             
             imgElement.onload = () => {
-              imgElement.classList.remove('img-placeholder'); // 💡 로드 완료 시 강제 높이 해제! (비율 원상복구)
+              imgElement.classList.remove('img-placeholder'); // 🚀 로드 완료 시 강제 높이 해제! 찌그러짐 원천봉쇄
               imgElement.style.opacity = "1";
             };
             imgElement.src = objectUrl;
@@ -422,6 +529,7 @@
         }
 
         localStorage.setItem(`book_sub_${parentId}`, selectedFolderId);
+        syncToCloud(); // 🚀 권 변경 동기화
 
         viewer.innerHTML = ""; 
         loadingStatus.style.display = "inline-block";
@@ -452,7 +560,7 @@
             return;
           }
 
-          updateFilters();
+          updateFiltersUIOnly();
           loadingStatus.style.display = "none";
 
           const observer = new IntersectionObserver((entries, obs) => {
@@ -464,34 +572,31 @@
                 obs.unobserve(img);
               }
             });
-          }, { rootMargin: '600px 0px' }); // 여유 공간 넉넉히
+          }, { rootMargin: '600px 0px' }); 
 
           for (let i = 0; i < totalFiles; i++) {
             const file = files[i];
             const img = document.createElement("img");
             img.setAttribute('data-fileid', file.id);
             img.setAttribute('data-index', i);
-            img.classList.add('img-placeholder'); // 💡 임시 높이 클래스 추가
+            img.classList.add('img-placeholder'); // 🚀 임시 높이 유지로 스크롤 안정화
             viewer.appendChild(img);
             observer.observe(img);
           }
 
-          // 🚀 저장된 위치로 복원하는 강력한 '타겟 락온(Lock-On)' 로직
           const savedPieceIndex = localStorage.getItem(`piece_pos_${parentId}_${selectedFolderId}`);
           
           if (savedPieceIndex !== null && parseInt(savedPieceIndex) > 0) {
-            isRestoringScroll = true; // 복원 시작! 오작동 저장 차단
+            isRestoringScroll = true; 
             
             const targetImg = viewer.querySelector(`img[data-index="${savedPieceIndex}"]`);
             if (targetImg) {
-              // 밀림 현상이 끝날 때까지 0.2초 간격으로 총 8번(약 1.6초) 타겟 위치로 멱살 잡고 끌고 옴
               let attempts = 0;
               const lockOnInterval = setInterval(() => {
                 targetImg.scrollIntoView({ behavior: 'auto' });
                 attempts++;
                 if (attempts >= 8) {
                   clearInterval(lockOnInterval);
-                  // 락온이 풀린 후 살짝 딜레이를 주고 저장 기능 다시 활성화
                   setTimeout(() => { isRestoringScroll = false; }, 300);
                 }
               }, 200);
@@ -515,8 +620,8 @@
             nextBtn.onclick = () => {
               subFolderSelect.selectedIndex = nextIndex;
               localStorage.setItem(`book_sub_${parentId}`, subFolderSelect.value);
-              // 💡 다음 권으로 넘어갈 땐 새 권의 위치를 0번(맨 처음)으로 초기화
               localStorage.setItem(`piece_pos_${parentId}_${subFolderSelect.value}`, 0);
+              syncToCloud();
               window.scrollTo({ top: 0, behavior: 'smooth' });
               btnLoadImages.click(); 
             };
@@ -548,7 +653,7 @@
 
       const sharpenMatrix = document.getElementById("sharpenMatrix");
 
-      const updateFilters = () => {
+      function updateFiltersUIOnly() {
         const b = document.getElementById("valBrightness").value;
         const c = document.getElementById("valContrast").value;
         const sh = parseInt(document.getElementById("valSharpen").value, 10);
@@ -556,10 +661,6 @@
         document.getElementById("txtBrightness").innerText = b + "%";
         document.getElementById("txtContrast").innerText = c + "%";
         document.getElementById("txtSharpen").innerText = sh + "%";
-
-        localStorage.setItem('filter_brightness', b);
-        localStorage.setItem('filter_contrast', c);
-        localStorage.setItem('filter_sharpen', sh);
 
         const amount = sh / 50;
         const center = 4 * amount + 1;
@@ -571,6 +672,19 @@
         );
         const svgFilter = sh > 0 ? `url(#sharpenFilter) ` : "";
         viewer.style.filter = `${svgFilter}brightness(${b}%) contrast(${c}%)`;
+      }
+
+      const updateFilters = () => {
+        const b = document.getElementById("valBrightness").value;
+        const c = document.getElementById("valContrast").value;
+        const sh = parseInt(document.getElementById("valSharpen").value, 10);
+
+        localStorage.setItem('filter_brightness', b);
+        localStorage.setItem('filter_contrast', c);
+        localStorage.setItem('filter_sharpen', sh);
+        syncToCloud(); // 🚀 필터 바뀔 때도 동기화
+        
+        updateFiltersUIOnly();
       };
 
       ["Brightness", "Contrast", "Sharpen"].forEach((type) => {
