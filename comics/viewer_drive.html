@@ -414,7 +414,7 @@
       async function loadParentFolders(comicRootId) {
         try {
           const query = `'${comicRootId}' in parents and mimeType = 'application/vnd.google-apps.folder' and trashed = false`;
-          const response = await gapi.client.drive.files.list({ q: query, orderBy: "name_natural", pageSize: 100 });
+          const response = await gapi.client.drive.files.list({ q: query, orderBy: "name_natural", pageSize: 1000 });
           parentFolderSelect.innerHTML = '<option value="">-- 작품 폴더 선택 --</option>';
           response.result.files.forEach((folder) => {
             const opt = document.createElement("option");
@@ -440,7 +440,7 @@
 
         try {
           const query = `'${parentId}' in parents and mimeType = 'application/vnd.google-apps.folder' and trashed = false`;
-          const response = await gapi.client.drive.files.list({ q: query, orderBy: "name_natural", pageSize: 100 });
+          const response = await gapi.client.drive.files.list({ q: query, orderBy: "name_natural", pageSize: 1000 });
           const subFolders = response.result.files;
 
           subFolders.forEach((folder) => {
@@ -545,7 +545,7 @@
           const response = await gapi.client.drive.files.list({
             q: query,
             orderBy: "name_natural",
-            pageSize: 500,
+            pageSize: 1000,
             fields: "files(id, name)",
           });
 
